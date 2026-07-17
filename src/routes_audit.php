@@ -1,0 +1,20 @@
+<?php
+declare(strict_types=1);
+
+if($path!=='/admin/audit')return;
+if(!(user()['is_admin']??false)){http_response_code(403);exit('Forbidden');}
+$userId=(int)($_GET['user_id']??0);$action=trim((string)($_GET['action']??''));$entity=trim((string)($_GET['entity']??''));$from=trim((string)($_GET['from']??''));$to=trim((string)($_GET['to']??''));
+$where=['1=1'];$params=[];
+if($userId){$where[]='a.user_id=?';$params[]=$userId;}
+if($action!==''){$where[]='a.action=?';$params[]=$action;}
+if($entity!==''){$where[]='a.entity_type=?';$params[]=$entity;}
+if(preg_match('/^\d{4}-\d{2}-\d{2}$/',$from)){$where[]='a.created_at>=?';$params[]=$from.' 00:00:00';}
+if(preg_match('/^\d{4}-\d{2}-\d{2}$/',$to)){$where[]='a.created_at<DATE_ADD(?,INTERVAL 1 DAY)';$params[]=$to.' 00:00:00';}
+$sql="SELECT a.*,COALESCE(u.username,IF(au.name IS NOT NULL,CONCAT('API: ',au.name),'System')) actor FROM audit_logs a LEFT JOIN users u ON u.id=a.user_id LEFT JOIN api_users au ON au.id=CAST(a.details_json->>'$.api_user_id' AS UNSIGNED) WHERE ".implode(' AND ',$where).' ORDER BY a.created_at DESC LIMIT 5000';
+$stmt=db()->prepare($sql);$stmt->execute($params);$rows=$stmt->fetchAll();
+if(($_GET['export']??'')==='csv'){
+    header('Content-Type: text/csv; charset=UTF-8');header('Content-Disposition: attachment; filename="opencrm-audit-'.date('Y-m-d').'.csv"');header('X-Content-Type-Options: nosniff');
+    $out=fopen('php://output','wb');fputcsv($out,['Timestamp','Actor','Action','Entity type','Entity ID','IP address','Details']);foreach($rows as $r)fputcsv($out,[$r['created_at'],$r['actor'],$r['action'],$r['entity_type'],$r['entity_id'],$r['ip_address'],$r['details_json']]);fclose($out);exit;
+}
+$users=db()->query('SELECT id,username FROM users ORDER BY username')->fetchAll();$actions=db()->query('SELECT DISTINCT action FROM audit_logs ORDER BY action')->fetchAll(PDO::FETCH_COLUMN);$entities=db()->query('SELECT DISTINCT entity_type FROM audit_logs ORDER BY entity_type')->fetchAll(PDO::FETCH_COLUMN);
+layout('Audit report',function()use($rows,$users,$actions,$entities,$userId,$action,$entity,$from,$to){?><div class="actions"><h1 style="margin:0">Audit report</h1><span class="spacer"></span><a class="btn secondary" href="/admin/settings">Application settings</a></div><form class="card" method="get"><div class="form-grid"><label>User<select name="user_id"><option value="">All users and API activity</option><?php foreach($users as $u):?><option value="<?=$u['id']?>" <?=$userId==(int)$u['id']?'selected':''?>><?=e($u['username'])?></option><?php endforeach?></select></label><label>Action<select name="action"><option value="">All actions</option><?php foreach($actions as $a):?><option value="<?=e($a)?>" <?=$action===$a?'selected':''?>><?=e($a)?></option><?php endforeach?></select></label><label>Entity type<select name="entity"><option value="">All entity types</option><?php foreach($entities as $e):?><option value="<?=e($e)?>" <?=$entity===$e?'selected':''?>><?=e($e)?></option><?php endforeach?></select></label><div></div><label>From date<input type="date" name="from" value="<?=e($from)?>"></label><label>Through date<input type="date" name="to" value="<?=e($to)?>"></label></div><div class="actions"><button>Run report</button><button class="secondary" name="export" value="csv">Export CSV</button><a class="btn secondary" href="/admin/audit">Clear filters</a></div></form><div class="card"><div class="actions"><h2 style="margin:0">Activity</h2><span class="spacer"></span><span class="muted"><?=count($rows)?> records<?=count($rows)===5000?' (limit reached)':''?></span></div><table><thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Record</th><th>IP address</th><th>Details</th></tr></thead><tbody><?php foreach($rows as $r):?><tr><td><?=e($r['created_at'])?></td><td><?=e($r['actor'])?></td><td><?=e(str_replace('_',' ',$r['action']))?></td><td><?=e($r['entity_type'])?><?=isset($r['entity_id'])?' #'.e($r['entity_id']):''?></td><td><?=e($r['ip_address'])?></td><td><code><?=e(mb_strimwidth((string)$r['details_json'],0,180,'…'))?></code></td></tr><?php endforeach?></tbody></table></div><?php });exit;
