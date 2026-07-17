@@ -2,6 +2,10 @@
 
 A lightweight, dependency-free CRM for PHP 8.2+ and MySQL 8.0+.
 
+## Disclaimer
+
+This software is provided **"AS IS"**, without warranty of any kind, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, and noninfringement. Use of this software is entirely at your own risk. See the [MIT License](LICENSE) for the complete terms.
+
 ## Features
 
 - Admin-managed users, roles, password resets, and granular permissions
