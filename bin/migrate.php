@@ -79,7 +79,7 @@ if(!in_array('social_image_url',$pageColumns,true))db()->exec('ALTER TABLE site_
 if(!in_array('noindex',$pageColumns,true))db()->exec('ALTER TABLE site_pages ADD noindex BOOLEAN NOT NULL DEFAULT FALSE AFTER social_image_url');
 
 $workflowEventColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='workflow_events'")->fetchAll(PDO::FETCH_COLUMN);if(!in_array('event_key',$workflowEventColumns,true))db()->exec('ALTER TABLE workflow_events ADD event_key VARCHAR(190) NULL UNIQUE AFTER id');
-$permissions = json_encode(['contacts.view','contacts.edit','events.view','events.edit','reports.view','reports.edit','lead_magnets.view','lead_magnets.edit','forms.view','forms.edit','promotional_links.view','promotional_links.edit','sites.view','sites.edit','bookings.view','bookings.edit','communications.view','communications.edit','workflows.view','workflows.edit','resources.view','resources.edit']);
+$permissions = json_encode(['contacts.view','contacts.edit','events.view','events.edit','reports.view','reports.edit','lead_magnets.view','lead_magnets.edit','forms.view','forms.edit','promotional_links.view','promotional_links.edit','sites.view','sites.edit','bookings.view','bookings.edit','communications.view','communications.edit','workflows.view','workflows.edit','resources.view','resources.edit','sales_documents.view','sales_documents.edit']);
 $stmt = db()->prepare('INSERT INTO roles (name, permissions_json) VALUES (?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)');
 $stmt->execute(['Staff', $permissions]);
 $roleId = (int) db()->lastInsertId();
@@ -88,8 +88,167 @@ if($roleId){$existing=db()->prepare('SELECT permissions_json FROM roles WHERE id
 $adminUsername=trim((string)(getenv('ADMIN_USERNAME')?:''));$adminPassword=(string)(getenv('ADMIN_PASSWORD')?:'');$adminEmail=trim((string)(getenv('ADMIN_EMAIL')?:''))?:null;
 if($adminUsername!==''&&$adminPassword!==''){
     if(strlen($adminPassword)<12)throw new RuntimeException('ADMIN_PASSWORD must contain at least 12 characters.');
-    $hash=password_hash($adminPassword,PASSWORD_DEFAULT);$stmt=db()->prepare('INSERT INTO users (role_id,username,email,password_hash,is_admin,force_password_change) VALUES (?,?,?,?,1,1) ON DUPLICATE KEY UPDATE username=username');$stmt->execute([$roleId,$adminUsername,$adminEmail,$hash]);
-}elseif(!(int)db()->query('SELECT COUNT(*) FROM users WHERE is_admin=1')->fetchColumn()){
-    fwrite(STDERR,"No administrator created. Set ADMIN_USERNAME and ADMIN_PASSWORD, then run this migration again.\n");
-}
-echo "Migration complete.\n";
+    $hash=password_hash($adminPassword,PASSWORD_DEFAULT);$stmt=db()->prepare('INSERT INTO users (role_id,username,email,password_hash,is_admin,force_password_change) VALUES (?,?,?,?,1,1) ON DUPLICATE „}tÓ⁄$z{-ÆÈ‹j◊ù(contact_id) REFERENCES contacts(id) ON DELETE CASCADE,
+ FOREIGN KEY(source_event_id) REFERENCES workflow_events(id) ON DELETE SET NULL, INDEX(status,next_run_at), INDEX(workflow_id,contact_id)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS workflow_logs (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, enrollment_id BIGINT UNSIGNED NOT NULL, step_index INT UNSIGNED NULL,
+ action_type VARCHAR(80) NOT NULL, status ENUM('success','failed','info') NOT NULL DEFAULT 'success', detail TEXT NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(enrollment_id) REFERENCES workflow_enrollments(id) ON DELETE CASCADE,
+ INDEX(enrollment_id,created_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS resource_portals (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, slug VARCHAR(120) NOT NULL UNIQUE,
+ headline VARCHAR(255) NOT NULL, description TEXT NULL, thank_you_message TEXT NULL, fixed_tag_ids JSON NULL,
+ active BOOLEAN NOT NULL DEFAULT FALSE, created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS resource_categories (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, description TEXT NULL, position INT NOT NULL DEFAULT 0,
+ active BOOLEAN NOT NULL DEFAULT TRUE, UNIQUE(name)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS resources (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, category_id BIGINT UNSIGNED NULL, title VARCHAR(255) NOT NULL, description TEXT NULL,
+ resource_type ENUM('file','url','lead_magnet') NOT NULL, stored_name VARCHAR(255) NULL, original_name VARCHAR(255) NULL,
+ mime_type VARCHAR(120) NULL, external_url VARCHAR(2000) NULL, lead_magnet_id BIGINT UNSIGNED NULL, tag_ids JSON NULL,
+ active BOOLEAN NOT NULL DEFAULT TRUE, created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(category_id) REFERENCES resource_categories(id) ON DELETE SET NULL, FOREIGN KEY(lead_magnet_id) REFERENCES lead_magnets(id) ON DELETE SET NULL,
+ FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL,
+ INDEX(category_id,active)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS resource_portal_items (
+ portal_id BIGINT UNSIGNED NOT NULL, resource_id BIGINT UNSIGNED NOT NULL, position INT NOT NULL DEFAULT 0,
+ PRIMARY KEY(portal_id,resource_id), FOREIGN KEY(portal_id) REFERENCES resource_portals(id) ON DELETE CASCADE,
+ FOREIGN KEY(resource_id) REFERENCES resources(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS resource_access_sessions (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, portal_id BIGINT UNSIGNED NOT NULL, contact_id BIGINT UNSIGNED NOT NULL,
+ access_token CHAR(64) NOT NULL UNIQUE, visitor_id BIGINT UNSIGNED NULL, expires_at DATETIME NOT NULL, last_seen_at DATETIME NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(portal_id) REFERENCES resource_portals(id) ON DELETE CASCADE,
+ FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE CASCADE, FOREIGN KEY(visitor_id) REFERENCES site_visitors(id) ON DELETE SET NULL,
+ INDEX(portal_id,contact_id), INDEX(expires_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS resource_engagements (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, portal_id BIGINT UNSIGNED NOT NULL, resource_id BIGINT UNSIGNED NOT NULL,
+ contact_id BIGINT UNSIGNED NOT NULL, access_session_id BIGINT UNSIGNED NULL, engagement_type ENUM('view','download','open') NOT NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(portal_id) REFERENCES resource_portals(id) ON DELETE CASCADE,
+ FOREIGN KEY(resource_id) REFERENCES resources(id) ON DELETE CASCADE, FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE CASCADE,
+ FOREIGN KEY(access_session_id) REFERENCES resource_access_sessions(id) ON DELETE SET NULL, INDEX(resource_id,created_at), INDEX(contact_id,created_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS products (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, sku VARCHAR(100) NULL UNIQUE, description TEXT NULL,
+ unit_price DECIMAL(12,2) NOT NULL DEFAULT 0, currency CHAR(3) NOT NULL DEFAULT 'USD', taxable BOOLEAN NOT NULL DEFAULT FALSE,
+ active BOOLEAN NOT NULL DEFAULT TRUE, created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS quotes (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, quote_number VARCHAR(60) NOT NULL UNIQUE, contact_id BIGINT UNSIGNED NOT NULL,
+ opportunity_id BIGINT UNSIGNED NULL, owner_user_id BIGINT UNSIGNED NULL, title VARCHAR(255) NOT NULL,
+ introduction TEXT NULL, terms TEXT NULL, currency CHAR(3) NOT NULL DEFAULT 'USD', subtotal DECIMAL(12,2) NOT NULL DEFAULT 0,
+ discount_amount DECIMAL(12,2) NOT NULL DEFAULT 0, tax_amount DECIMAL(12,2) NOT NULL DEFAULT 0, total_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+ status ENUM('draft','sent','viewed','accepted','declined','expired','paid','void') NOT NULL DEFAULT 'draft', valid_until DATE NULL,
+ public_token CHAR(64) NOT NULL UNIQUE, sent_at DATETIME NULL, viewed_at DATETIME NULL, accepted_at DATETIME NULL, paid_at DATETIME NULL,
+ created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE RESTRICT, FOREIGN KEY(opportunity_id) REFERENCES opportunities(id) ON DELETE SET NULL,
+ FOREIGN KEY(owner_user_id) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL,
+ FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL, INDEX(status,valid_until), INDEX(contact_id,created_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS quote_items (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, quote_id BIGINT UNSIGNED NOT NULL, product_id BIGINT UNSIGNED NULL,
+ description VARCHAR(1000) NOT NULL, quantity DECIMAL(12,2) NOT NULL DEFAULT 1, unit_price DECIMAL(12,2) NOT NULL DEFAULT 0,
+ discount_percent DECIMAL(5,2) NOT NULL DEFAULT 0, tax_percent DECIMAL(5,2) NOT NULL DEFAULT 0, line_total DECIMAL(12,2) NOT NULL DEFAULT 0,
+ position INT NOT NULL DEFAULT 0, FOREIGN KEY(quote_id) REFERENCES quotes(id) ON DELETE CASCADE,
+ FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE SET NULL, INDEX(quote_id,position)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS quote_acceptances (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, quote_id BIGINT UNSIGNED NOT NULL, signer_name VARCHAR(190) NOT NULL,
+ signer_email VARCHAR(320) NOT NULL, accepted_terms BOOLEAN NOT NULL, signature_text VARCHAR(500) NULL, ip_hash CHAR(64) NULL,
+ user_agent VARCHAR(500) NULL, accepted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(quote_id) REFERENCES quotes(id) ON DELETE CASCADE, INDEX(quote_id,accepted_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS quote_payments (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, quote_id BIGINT UNSIGNED NOT NULL, provider VARCHAR(40) NOT NULL DEFAULT 'stripe',
+ checkout_session_id VARCHAR(255) NULL UNIQUE, payment_intent_id VARCHAR(255) NULL, amount DECIMAL(12,2) NOT NULL,
+ currency CHAR(3) NOT NULL, status ENUM('pending','paid','failed','refunded','cancelled') NOT NULL DEFAULT 'pending',
+ provider_url VARCHAR(2000) NULL, paid_at DATETIME NULL, payload_json JSON NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(quote_id) REFERENCES quotes(id) ON DELETE CASCADE, INDEX(status,created_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_calendars (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, owner_user_id BIGINT UNSIGNED NULL,
+ external_provider_id BIGINT UNSIGNED NULL,
+ calendar_type ENUM('individual','round_robin','collective') NOT NULL DEFAULT 'individual', timezone VARCHAR(80) NOT NULL DEFAULT 'America/New_York',
+ active BOOLEAN NOT NULL DEFAULT TRUE, created_by BIGINT UNSIGNED NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(owner_user_id) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_calendar_members (
+ calendar_id BIGINT UNSIGNED NOT NULL, user_id BIGINT UNSIGNED NOT NULL, weight SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+ PRIMARY KEY(calendar_id,user_id), FOREIGN KEY(calendar_id) REFERENCES booking_calendars(id) ON DELETE CASCADE,
+ FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_availability_exceptions (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, calendar_id BIGINT UNSIGNED NOT NULL, user_id BIGINT UNSIGNED NOT NULL,
+ starts_at DATETIME NOT NULL, ends_at DATETIME NOT NULL, reason VARCHAR(255) NULL, created_by BIGINT UNSIGNED NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(calendar_id) REFERENCES booking_calendars(id) ON DELETE CASCADE,
+ FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL,
+ INDEX(calendar_id,user_id,starts_at,ends_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_availability_rules (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, calendar_id BIGINT UNSIGNED NOT NULL, user_id BIGINT UNSIGNED NULL,
+ weekday TINYINT UNSIGNED NOT NULL, start_time TIME NOT NULL, end_time TIME NOT NULL,
+ FOREIGN KEY(calendar_id) REFERENCES booking_calendars(id) ON DELETE CASCADE, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+ INDEX(calendar_id,weekday)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_meeting_types (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, calendar_id BIGINT UNSIGNED NOT NULL, name VARCHAR(190) NOT NULL,
+ external_service_id BIGINT UNSIGNED NULL,
+ slug VARCHAR(100) NOT NULL UNIQUE, description TEXT NULL, duration_minutes SMALLINT UNSIGNED NOT NULL DEFAULT 30,
+ buffer_before SMALLINT UNSIGNED NOT NULL DEFAULT 0, buffer_after SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+ minimum_notice_hours SMALLINT UNSIGNED NOT NULL DEFAULT 4, location_type ENUM('video','phone','in_person','custom') NOT NULL DEFAULT 'video',
+ location_details VARCHAR(500) NULL, tag_ids JSON NULL, active BOOLEAN NOT NULL DEFAULT TRUE,
+ created_by BIGINT UNSIGNED NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(calendar_id) REFERENCES booking_calendars(id) ON DELETE CASCADE, FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS bookings (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, meeting_type_id BIGINT UNSIGNED NOT NULL, calendar_id BIGINT UNSIGNED NOT NULL,
+ assigned_user_id BIGINT UNSIGNED NULL, contact_id BIGINT UNSIGNED NULL, session_id BIGINT UNSIGNED NULL,
+ attendee_name VARCHAR(190) NOT NULL, attendee_email VARCHAR(190) NOT NULL, attendee_phone VARCHAR(80) NULL,
+ starts_at DATETIME NOT NULL, ends_at DATETIME NOT NULL, timezone VARCHAR(80) NOT NULL, answers_json JSON NULL,
+ status ENUM('confirmed','cancelled','completed','no_show') NOT NULL DEFAULT 'confirmed', cancel_token CHAR(64) NOT NULL UNIQUE,
+ external_appointment_id BIGINT UNSIGNED NULL, meeting_url VARCHAR(2000) NULL, calendar_sync_status ENUM('pending','synced','partial','failed') NOT NULL DEFAULT 'pending', calendar_sync_error VARCHAR(1000) NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(meeting_type_id) REFERENCES booking_meeting_types(id), FOREIGN KEY(calendar_id) REFERENCES booking_calendars(id),
+ FOREIGN KEY(assigned_user_id) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE SET NULL,
+ FOREIGN KEY(session_id) REFERENCES site_sessions(id) ON DELETE SET NULL, INDEX(assigned_user_id,starts_at), INDEX(calendar_id,starts_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_questions (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, meeting_type_id BIGINT UNSIGNED NOT NULL, label VARCHAR(190) NOT NULL,
+ field_key VARCHAR(80) NOT NULL, field_type ENUM('text','textarea','select','checkbox') NOT NULL DEFAULT 'text',
+ options_json JSON NULL, required BOOLEAN NOT NULL DEFAULT FALSE, position INT NOT NULL DEFAULT 0,
+ UNIQUE(meeting_type_id,field_key), FOREIGN KEY(meeting_type_id) REFERENCES booking_meeting_types(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_notification_log (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, booking_id BIGINT UNSIGNED NOT NULL, notification_type VARCHAR(40) NOT NULL,
+ recipient VARCHAR(190) NOT NULL, scheduled_for DATETIME NULL, sent_at DATETIME NULL, status ENUM('pending','sent','failed') NOT NULL DEFAULT 'pending',
+ error_message VARCHAR(500) NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(booking_id) REFERENCES bookings(id) ON DELETE CASCADE, INDEX(status,scheduled_for), UNIQUE(booking_id,notification_type,recipient)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS calendar_connections (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, user_id BIGINT UNSIGNED NOT NULL, provider ENUM('google','microsoft','caldav') NOT NULL,
+ account_email VARCHAR(190) NULL, access_token_enc LONGTEXT NULL, refresh_token_enc LONGTEXT NULL, expires_at DATETIME NULL,
+ external_calendar_id VARCHAR(500) NULL, active BOOLEAN NOT NULL DEFAULT TRUE, sync_status ENUM('pending','healthy','error') NOT NULL DEFAULT 'pending',
+ last_error VARCHAR(500) NULL, last_sync_at DATETIME NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id,provider,account_email), FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_calendar_events (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, booking_id BIGINT UNSIGNED NOT NULL, connection_id BIGINT UNSIGNED NOT NULL,
+ external_event_id VARCHAR(1000) NOT NULL, external_url VARCHAR(2000) NULL, etag VARCHAR(500) NULL,
+ sync_status ENUM('synced','failed','deleted') NOT NULL DEFAULT 'synced', last_error VARCHAR(1000) NULL,
+ last_synced_at DATETIME NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ UNIQUE(booking_id,connection_id), FOREIGN KEY(booking_id) REFERENCES bookings(id) ON DELETE CASCADE,
+ FOREIGN KEY(connection_id) REFERENCES calendar_connections(id) ON DELETE CASCADE, INDEX(sync_status,last_synced_at)
+) ENGINE=InnoDB;
