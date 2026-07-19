@@ -26,7 +26,9 @@ if(preg_match('#^/alerts/system/(\d+)$#',$path,$m)&&$method==='POST'){
 }
 if(preg_match('#^/events/(\d+)/reminders$#',$path,$m)&&$method==='POST'){
     require_permission('events.view');verify_csrf();$eventId=(int)$m[1];$message=trim((string)post('message'));$due=str_replace('T',' ',(string)post('due_at'));
+    require_permission('alerts.edit');
     if($message===''||!strtotime($due)){flash('error','Alert message and date are required.');redirect('/events/'.$eventId);}
     db()->prepare('INSERT INTO event_reminders(event_id,user_id,message,due_at) VALUES(?,?,?,?)')->execute([$eventId,user()['id'],$message,$due]);
     audit('create','event_reminder',(int)db()->lastInsertId(),['event_id'=>$eventId]);flash('success','Event alert created.');redirect('/events/'.$eventId);
 }
+

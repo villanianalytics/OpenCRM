@@ -12,6 +12,12 @@ Use Admin settings to set the application name, logo, color scheme, New York or 
 - API users can be create-only to prevent automation from altering existing records.
 - Credentials are encrypted in application settings or supplied through the server environment. Never commit `.env`, tokens, keys, exports, uploads, or logs.
 
+## Role permissions
+
+Admin → Role permissions provides independent View/use and Create/edit controls for Contacts, Companies, Opportunities, Events, Alerts, Partner Sales, Reports, Lead Magnets, Forms, Promotional Links, Sites, Bookings, Communications, Workflows, Resources, and Quotes/Payments. Edit automatically includes view. Navigation, direct URLs, mutations, dashboard cards, and report datasets enforce the same permissions server-side. Users receive changed role permissions at their next sign-in.
+
+Reports require both `reports.view` and view permission for the selected source module. Partner Sales view users see their own performance; Partner Sales edit users can review and manage all partners. Record ownership and tag-level restrictions continue to apply after feature permission checks.
+
 ## Configuration catalogs
 
 Maintain tags and tag groups, custom fields and groupings, conditional field rules, pipeline stages, opportunity scores/statuses, snooze periods, and other dropdown lists centrally.

@@ -52,6 +52,11 @@ function require_login(): void { if (!user()) redirect('/login'); }
 function can(string $permission): bool {
     $u = user();
     if(!$u)return false;if($u['is_admin'])return true;$permissions=$u['permissions']??[];if(in_array($permission,$permissions,true))return true;
+    $path=(string)($GLOBALS['path']??'');$suffix=str_ends_with($permission,'.edit')?'.edit':'.view';
+    $hasModulePermission=function(string $module)use($permissions,$suffix):bool{return in_array($module.$suffix,$permissions,true)||($suffix==='.view'&&in_array($module.'.edit',$permissions,true));};
+    if((str_starts_with($path,'/companies'))&&str_starts_with($permission,'contacts.')&&$hasModulePermission('companies'))return true;
+    if((str_starts_with($path,'/opportunities')||str_starts_with($path,'/api/opportunity-statuses')||str_starts_with($path,'/api/record-actions/opportunity'))&&str_starts_with($permission,'contacts.')&&$hasModulePermission('opportunities'))return true;
+    if(str_starts_with($path,'/promotions/links')&&str_starts_with($permission,'events.')&&$hasModulePermission('promotional_links'))return true;
     if(str_ends_with($permission,'.view')&&in_array(substr($permission,0,-5).'.edit',$permissions,true))return true;
     return false;
 }
@@ -180,3 +185,4 @@ function save_contact_custom_values(int $contactId,array $values): void {
     $save=db()->prepare('INSERT INTO contact_custom_values(contact_id,custom_field_id,field_value) VALUES(?,?,?) ON DUPLICATE KEY UPDATE field_value=VALUES(field_value)');
     foreach(custom_field_definitions() as $field){$id=(int)$field['id'];if(!array_key_exists($id,$values))continue;if($field['tag_ids']&&!array_intersect($field['tag_ids'],$contactTags))continue;foreach($field['conditions'] as $condition)if(!custom_condition_matches($condition,(string)($combined[(int)$condition['depends_on_field_id']]??'')))continue 2;$value=trim((string)$values[$id]);if($field['field_type']==='list'&&!in_array($value,array_column($field['options'],'option_value'),true))$value='';if($field['field_type']==='email'&&$value!==''&&!filter_var($value,FILTER_VALIDATE_EMAIL))continue;if($field['field_type']==='url'&&$value!==''&&!filter_var($value,FILTER_VALIDATE_URL))continue;if(in_array($field['field_type'],['number','currency'],true)&&$value!==''&&!is_numeric($value))continue;if($field['validation_pattern']&&$value!==''&&@preg_match('/'.$field['validation_pattern'].'/u',$value)!==1)continue;$save->execute([$contactId,$id,$value]);}
 }
+
