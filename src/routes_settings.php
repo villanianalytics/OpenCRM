@@ -38,8 +38,7 @@ if ($method === 'POST') {
 
 $settings=app_settings();
 layout('Application settings',function()use($settings){?>
-<div class="actions"><a class="btn" href="/admin/mail">Mail settings</a></div>
-<div class="actions"><h1 style="margin:0">Application settings</h1><span class="spacer"></span><a class="btn secondary" href="/admin/data-quality">Data quality</a><a class="btn secondary" href="/admin/custom-fields">Custom fields</a><a class="btn secondary" href="/admin/dropdowns">Dropdown lists</a><a class="btn secondary" href="/admin/audit">Audit report</a><a class="btn secondary" href="/admin/logs">Application logs</a><a class="btn secondary" href="/admin/health">System health</a><a class="btn secondary" href="/admin/tags">Tags</a><a class="btn secondary" href="/admin/api-users">API users</a><a class="btn secondary" href="/admin/system-alerts">System alerts</a><a class="btn secondary" href="/admin/users">Users & permissions</a></div>
+<div class="actions"><h1 style="margin:0">Application settings</h1></div>
 <form class="card" method="post" enctype="multipart/form-data"><input type="hidden" name="_csrf" value="<?=csrf()?>">
 <div class="form-grid"><label>Application name<input name="app_name" value="<?=e($settings['app_name'])?>" maxlength="80" required></label><div></div>
 <label>Primary color<input type="color" name="primary_color" value="<?=e($settings['primary_color'])?>"></label>

@@ -24,6 +24,7 @@ $lists=[
  'opportunity_status'=>['Opportunity statuses','Pipeline status',['open'=>'Open','won'=>'Won','lost'=>'Lost']],
  'opportunity_source'=>['Opportunity sources','Where an opportunity originated',['none'=>'None','event'=>'Event','other'=>'Other']],
  'event_type'=>['Event types','Types of events',['webinar'=>'Webinar','conference'=>'Conference','presentation'=>'Presentation','other'=>'Other']],
+ 'lead_magnet_type'=>['Lead magnet types','Artifact formats available in the Lead Magnet Generator',['flyer'=>'1 Page Flyer','ebook'=>'EBook (DOCX + PDF)','checklist'=>'Checklist','other'=>'Other']],
 ];
 foreach($lists as $key=>[$name,$description,$values]){
     $stmt=db()->prepare('INSERT INTO option_lists(list_key,name,description) VALUES(?,?,?) ON DUPLICATE KEY UPDATE name=VALUES(name),description=VALUES(description)');$stmt->execute([$key,$name,$description]);

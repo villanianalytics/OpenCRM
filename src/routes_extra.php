@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . '/routes_settings.php';
+require __DIR__ . '/routes_ai_settings.php';
 require __DIR__ . '/routes_mail_settings.php';
 require __DIR__ . '/routes_system_alerts.php';
 require __DIR__ . '/routes_api_users.php';

@@ -237,3 +237,12 @@ CREATE TABLE IF NOT EXISTS promotional_link_clicks (
  FOREIGN KEY(promotional_link_id) REFERENCES promotional_links(id) ON DELETE CASCADE,
  INDEX(promotional_link_id,clicked_at), INDEX(promotional_link_id,visitor_hash)
 ) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS knowledge_base_items (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, title VARCHAR(190) NOT NULL,
+ item_type ENUM('text','file') NOT NULL DEFAULT 'text', body LONGTEXT NULL,
+ stored_name VARCHAR(255) NULL, original_name VARCHAR(255) NULL, mime_type VARCHAR(120) NULL,
+ extracted_text LONGTEXT NULL, created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL,
+ FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL, INDEX(item_type,updated_at)
+) ENGINE=InnoDB;
