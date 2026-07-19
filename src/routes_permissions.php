@@ -13,6 +13,8 @@ $catalog=[
  'sites'=>['Website and landing-page builder','Build, publish, and analyze websites'],
  'bookings'=>['Bookings','Manage calendars, meeting types, and appointments'],
  'communications'=>['Communications','Send email and manage contact conversations'],
+ 'workflows'=>['Workflows','Build and monitor lightweight CRM automations'],
+ 'resources'=>['Resources Library','Publish gated resource portals and review engagement'],
 ];
 if($method==='POST'){
  verify_csrf();$roleId=(int)post('role_id');$role=db()->prepare('SELECT * FROM roles WHERE id=?');$role->execute([$roleId]);$row=$role->fetch();if(!$row){http_response_code(404);exit('Role not found');}
