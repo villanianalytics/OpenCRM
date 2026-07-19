@@ -1,14 +1,15 @@
 document.addEventListener('DOMContentLoaded',async()=>{
   const nav=document.querySelector('.topbar .nav');if(!nav)return;
   const reports=nav.querySelector('a[href="/reports"]'),admin=[...nav.querySelectorAll(':scope > .nav-submenu')].find(x=>x.querySelector('summary')?.textContent.trim()==='Admin');
-  const existingMarketing=[...nav.querySelectorAll(':scope > .nav-submenu')].find(x=>['Promotions','Marketing'].includes(x.querySelector('summary')?.textContent.trim()));
+  const existingPromotions=[...nav.querySelectorAll(':scope > .nav-submenu')].find(x=>['Promotions','Marketing'].includes(x.querySelector('summary')?.textContent.trim()));
   const makeGroup=(label,existing)=>{const group=existing||document.createElement('details');group.className='nav-submenu';if(!existing)group.innerHTML='<summary></summary><div></div>';group.querySelector('summary').textContent=label;group.querySelector('summary').setAttribute('aria-label',label+' menu');return group};
-  const sales=makeGroup('Sales'),marketing=makeGroup('Marketing',existingMarketing),engage=makeGroup('Engage');
+  const sales=makeGroup('Sales'),promotions=makeGroup('Promotions',existingPromotions),automation=makeGroup('Automation'),pages=makeGroup('Pages');
   const move=(group,items)=>items.forEach(([href,label])=>{const link=nav.querySelector(`a[href="${href}"]`);if(link){link.textContent=label;group.querySelector('div').append(link)}});
   move(sales,[['/companies','Companies'],['/opportunities','Opportunities'],['/quotes','Quotes']]);
-  move(marketing,[['/events','Events'],['/promotions/links','Promotional links'],['/promotions/links/stats','Link analytics'],['/promotions/attribution','Marketing attribution'],['/lead-magnets','Lead magnets'],['/forms','Forms'],['/sites','Sites & landing pages'],['/resources','Resources']]);
-  move(engage,[['/conversations','Conversations'],['/bookings','Bookings'],['/workflows','Workflows'],['/alerts','Alerts']]);
-  const placeGroups=()=>[sales,marketing,engage].forEach(group=>{if(group.querySelector('a'))nav.insertBefore(group,reports||admin||null);else group.remove()});
+  move(promotions,[['/events','Events'],['/promotions/links','Promotional links'],['/promotions/links/stats','Link analytics'],['/promotions/attribution','Marketing attribution'],['/lead-magnets','Lead magnets']]);
+  move(automation,[['/workflows','Workflows']]);
+  move(pages,[['/resources','Resources'],['/sites','Sites & landing pages'],['/forms','Forms'],['/bookings','Bookings']]);
+  const placeGroups=()=>[sales,promotions,automation,pages].forEach(group=>{if(group.querySelector('a'))nav.insertBefore(group,reports||admin||null);else group.remove()});
   placeGroups();
   const markActive=()=>{nav.querySelectorAll('a').forEach(link=>{const href=link.getAttribute('href');link.classList.toggle('active',href==='/'?location.pathname==='/':location.pathname===href||location.pathname.startsWith(href+'/'))});nav.querySelectorAll('.nav-submenu').forEach(group=>group.classList.toggle('has-active',!!group.querySelector('a.active')))};
   markActive();
