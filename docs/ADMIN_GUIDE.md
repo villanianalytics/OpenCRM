@@ -1,0 +1,25 @@
+# OpenCRM Administrator Guide
+
+## Initial configuration
+
+Use Admin settings to set the application name, logo, color scheme, New York or another timezone, mail delivery, logging level, and retention. Create users and roles with the minimum permissions required.
+
+## Security model
+
+- Feature permissions control view and edit access.
+- Tag policies can hide a tag and its protected records or provide read/write access.
+- Record changes require creator, owner, or administrator status; visible users may add notes.
+- API users can be create-only to prevent automation from altering existing records.
+- Credentials are encrypted in application settings or supplied through the server environment. Never commit `.env`, tokens, keys, exports, uploads, or logs.
+
+## Configuration catalogs
+
+Maintain tags and tag groups, custom fields and groupings, conditional field rules, pipeline stages, opportunity scores/statuses, snooze periods, and other dropdown lists centrally.
+
+## Operations
+
+Audit reports show logins and record actions. Application logs capture configured request/payload detail and can be purged by age. System health covers database, storage, runtime, and scheduled integration jobs. Lightsail snapshots protect the server, but database/export recovery procedures should still be tested periodically.
+
+## Sites and custom domains
+
+Add a domain from a site's Domains page, publish the displayed `_opencrm` TXT record, point the hostname to the Lightsail instance, and check DNS. A root-only scheduled job provisions Apache and Let's Encrypt after ownership verification. Configure 301/302 path redirects when published URLs change.

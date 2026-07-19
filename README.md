@@ -15,6 +15,7 @@ This software is provided **"AS IS"**, without warranty of any kind, express or 
 - Events, slide uploads, and linked attendees
 - Dynamic promotional links and downloadable QR codes with click, visitor, referrer, device, and UTM analytics
 - Saved reports with filters and graphical charts
+- Searchable in-application Help Center plus user, administrator, and integration manuals in `docs/`
 - CSRF protection, secure sessions, password hashing, upload validation, and audit logs
 
 ## Install
