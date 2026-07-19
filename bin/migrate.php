@@ -59,6 +59,11 @@ db()->exec('UPDATE contacts SET owner_id=created_by WHERE owner_id IS NULL AND c
 
 $formColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='crm_forms'")->fetchAll(PDO::FETCH_COLUMN);
 if(!in_array('submit_label',$formColumns,true))db()->exec("ALTER TABLE crm_forms ADD submit_label VARCHAR(120) NOT NULL DEFAULT 'Submit' AFTER thank_you_message");
+$promoColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='promotional_links'")->fetchAll(PDO::FETCH_COLUMN);
+if(!in_array('campaign_name',$promoColumns,true))db()->exec('ALTER TABLE promotional_links ADD campaign_name VARCHAR(190) NULL AFTER destination_url');
+if(!in_array('channel',$promoColumns,true))db()->exec('ALTER TABLE promotional_links ADD channel VARCHAR(120) NULL AFTER campaign_name');
+if(!in_array('variant',$promoColumns,true))db()->exec('ALTER TABLE promotional_links ADD variant VARCHAR(120) NULL AFTER channel');
+$roleRows=db()->query('SELECT id,permissions_json FROM roles')->fetchAll();$saveRole=db()->prepare('UPDATE roles SET permissions_json=? WHERE id=?');foreach($roleRows as $roleRow){$rp=json_decode((string)$roleRow['permissions_json'],true)?:[];$rp=array_values(array_unique(array_merge($rp,['promotional_links.view','promotional_links.edit','events.view'])));$saveRole->execute([json_encode($rp),$roleRow['id']]);}
 
 $permissions = json_encode(['contacts.view','contacts.edit','events.view','events.edit','reports.view','reports.edit','lead_magnets.view','lead_magnets.edit','forms.view','forms.edit']);
 $stmt = db()->prepare('INSERT INTO roles (name, permissions_json) VALUES (?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)');
