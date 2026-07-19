@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   const makeGroup=(label,existing)=>{const group=existing||document.createElement('details');group.className='nav-submenu';if(!existing)group.innerHTML='<summary></summary><div></div>';group.querySelector('summary').textContent=label;group.querySelector('summary').setAttribute('aria-label',label+' menu');return group};
   const sales=makeGroup('Sales'),promotions=makeGroup('Promotions',existingPromotions),automation=makeGroup('Automation'),pages=makeGroup('Pages');
   const move=(group,items)=>items.forEach(([href,label])=>{const link=nav.querySelector(`a[href="${href}"]`);if(link){link.textContent=label;group.querySelector('div').append(link)}});
-  move(sales,[['/companies','Companies'],['/opportunities','Opportunities'],['/quotes','Quotes']]);
+  move(sales,[['/companies','Companies'],['/opportunities','Opportunities'],['/quotes','Quotes'],['/conversations','Conversations']]);
   move(promotions,[['/events','Events'],['/promotions/links','Promotional links'],['/promotions/links/stats','Link analytics'],['/promotions/attribution','Marketing attribution'],['/lead-magnets','Lead magnets']]);
   move(automation,[['/workflows','Workflows']]);
   move(pages,[['/resources','Resources'],['/sites','Sites & landing pages'],['/forms','Forms'],['/bookings','Bookings']]);
