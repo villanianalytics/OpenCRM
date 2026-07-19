@@ -107,7 +107,7 @@ function app_settings(bool $refresh=false): array {
     static $settings;
     if($refresh)$settings=null;
     if ($settings === null) {
-        $settings = ['app_name'=>'OpenCRM','primary_color'=>'#1565c0','accent_color'=>'#43a047','logo_path'=>'','logo_mime'=>'','logging_level'=>'info','app_timezone'=>'America/New_York','mail_transport'=>'local','mail_from_address'=>'','mail_from_name'=>'','smtp_host'=>'','smtp_port'=>'587','smtp_encryption'=>'tls','smtp_username'=>'','smtp_password_enc'=>'','openai_api_key_enc'=>'','openai_model'=>'gpt-5.4-mini'];
+        $settings = ['app_name'=>'OpenCRM','primary_color'=>'#1565c0','accent_color'=>'#43a047','logo_path'=>'','logo_mime'=>'','logging_level'=>'info','app_timezone'=>'America/New_York','mail_transport'=>'local','mail_from_address'=>'','mail_from_name'=>'','smtp_host'=>'','smtp_port'=>'587','smtp_encryption'=>'tls','smtp_username'=>'','smtp_password_enc'=>'','openai_api_key_enc'=>'','openai_model'=>'gpt-5.4-mini','booking_engine'=>'native','easyappointments_url'=>'','easyappointments_api_token_enc'=>''];
         try {
             foreach (db()->query('SELECT setting_key,setting_value FROM app_settings')->fetchAll() as $row) $settings[$row['setting_key']]=$row['setting_value'];
         } catch (PDOException) {

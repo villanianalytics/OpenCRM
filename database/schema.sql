@@ -198,9 +198,7 @@ CREATE TABLE IF NOT EXISTS custom_field_conditions (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, custom_field_id BIGINT UNSIGNED NOT NULL,
  depends_on_field_id BIGINT UNSIGNED NOT NULL, operator ENUM('equals','not_equals','is_empty','not_empty') NOT NULL DEFAULT 'equals', expected_value TEXT NULL,
  FOREIGN KEY(custom_field_id) REFERENCES custom_fields(id) ON DELETE CASCADE,
- FO„Õ≠¢Gß≤⁄Óù∆≠y”REATE TABLE IF NOT EXISTS promotional_links (
- id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL,
- slug VARCHAR(80) NOT NULL UNIQUE, destination_url VARCHAR(2000) NOT NULL,
+ FOÁnÌ¢Gß≤⁄Óù∆≠y“(80) NOT NULL UNIQUE, destination_url VARCHAR(2000) NOT NULL,
  campaign_name VARCHAR(190) NULL, channel VARCHAR(120) NULL, variant VARCHAR(120) NULL,
  active BOOLEAN NOT NULL DEFAULT TRUE, created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL,
  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -337,6 +335,7 @@ CREATE TABLE IF NOT EXISTS site_conversions (
 ) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS booking_calendars (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, owner_user_id BIGINT UNSIGNED NULL,
+ external_provider_id BIGINT UNSIGNED NULL,
  calendar_type ENUM('individual','round_robin','collective') NOT NULL DEFAULT 'individual', timezone VARCHAR(80) NOT NULL DEFAULT 'America/New_York',
  active BOOLEAN NOT NULL DEFAULT TRUE, created_by BIGINT UNSIGNED NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
  FOREIGN KEY(owner_user_id) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL
@@ -354,6 +353,7 @@ CREATE TABLE IF NOT EXISTS booking_availability_rules (
 ) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS booking_meeting_types (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, calendar_id BIGINT UNSIGNED NOT NULL, name VARCHAR(190) NOT NULL,
+ external_service_id BIGINT UNSIGNED NULL,
  slug VARCHAR(100) NOT NULL UNIQUE, description TEXT NULL, duration_minutes SMALLINT UNSIGNED NOT NULL DEFAULT 30,
  buffer_before SMALLINT UNSIGNED NOT NULL DEFAULT 0, buffer_after SMALLINT UNSIGNED NOT NULL DEFAULT 0,
  minimum_notice_hours SMALLINT UNSIGNED NOT NULL DEFAULT 4, location_type ENUM('video','phone','in_person','custom') NOT NULL DEFAULT 'video',
@@ -367,6 +367,7 @@ CREATE TABLE IF NOT EXISTS bookings (
  attendee_name VARCHAR(190) NOT NULL, attendee_email VARCHAR(190) NOT NULL, attendee_phone VARCHAR(80) NULL,
  starts_at DATETIME NOT NULL, ends_at DATETIME NOT NULL, timezone VARCHAR(80) NOT NULL, answers_json JSON NULL,
  status ENUM('confirmed','cancelled','completed','no_show') NOT NULL DEFAULT 'confirmed', cancel_token CHAR(64) NOT NULL UNIQUE,
+ external_appointment_id BIGINT UNSIGNED NULL,
  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
  FOREIGN KEY(meeting_type_id) REFERENCES booking_meeting_types(id), FOREIGN KEY(calendar_id) REFERENCES booking_calendars(id),
  FOREIGN KEY(assigned_user_id) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE SET NULL,
