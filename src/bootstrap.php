@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+$composerAutoload=dirname(__DIR__).'/vendor/autoload.php';
+if(is_file($composerAutoload))require_once $composerAutoload;
+
 $config = require dirname(__DIR__) . '/config.php';
 date_default_timezone_set($config['timezone']);
 

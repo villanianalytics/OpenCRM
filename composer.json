@@ -1,0 +1,13 @@
+{
+  "name": "villanianalytics/opencrm",
+  "description": "Lightweight PHP CRM",
+  "type": "project",
+  "require": {
+    "php": "^8.2",
+    "dompdf/dompdf": "^3.1"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  }
+}

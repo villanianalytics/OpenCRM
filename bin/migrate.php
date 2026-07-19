@@ -57,11 +57,15 @@ if(!in_array('created_by',$opportunityColumns,true))db()->exec('ALTER TABLE oppo
 $eventColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='events'")->fetchAll(PDO::FETCH_COLUMN);if(!in_array('owner_id',$eventColumns,true))db()->exec('ALTER TABLE events ADD owner_id BIGINT UNSIGNED NULL AFTER created_by');
 db()->exec('UPDATE contacts SET owner_id=created_by WHERE owner_id IS NULL AND created_by IS NOT NULL');db()->exec('UPDATE companies SET owner_id=created_by WHERE owner_id IS NULL AND created_by IS NOT NULL');db()->exec('UPDATE opportunities SET owner_id=created_by WHERE owner_id IS NULL AND created_by IS NOT NULL');db()->exec('UPDATE events SET owner_id=created_by WHERE owner_id IS NULL AND created_by IS NOT NULL');
 
-$permissions = json_encode(['contacts.view','contacts.edit','events.view','events.edit','reports.view','reports.edit']);
+$formColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='crm_forms'")->fetchAll(PDO::FETCH_COLUMN);
+if(!in_array('submit_label',$formColumns,true))db()->exec("ALTER TABLE crm_forms ADD submit_label VARCHAR(120) NOT NULL DEFAULT 'Submit' AFTER thank_you_message");
+
+$permissions = json_encode(['contacts.view','contacts.edit','events.view','events.edit','reports.view','reports.edit','lead_magnets.view','lead_magnets.edit','forms.view','forms.edit']);
 $stmt = db()->prepare('INSERT INTO roles (name, permissions_json) VALUES (?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)');
 $stmt->execute(['Staff', $permissions]);
 $roleId = (int) db()->lastInsertId();
 if (!$roleId) $roleId = (int) db()->query("SELECT id FROM roles WHERE name='Staff'")->fetchColumn();
+if($roleId){$existing=db()->prepare('SELECT permissions_json FROM roles WHERE id=?');$existing->execute([$roleId]);$merged=array_values(array_unique(array_merge(json_decode((string)$existing->fetchColumn(),true)?:[],json_decode($permissions,true))));db()->prepare('UPDATE roles SET permissions_json=? WHERE id=?')->execute([json_encode($merged),$roleId]);}
 $adminUsername=trim((string)(getenv('ADMIN_USERNAME')?:''));$adminPassword=(string)(getenv('ADMIN_PASSWORD')?:'');$adminEmail=trim((string)(getenv('ADMIN_EMAIL')?:''))?:null;
 if($adminUsername!==''&&$adminPassword!==''){
     if(strlen($adminPassword)<12)throw new RuntimeException('ADMIN_PASSWORD must contain at least 12 characters.');

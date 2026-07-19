@@ -246,3 +246,52 @@ CREATE TABLE IF NOT EXISTS knowledge_base_items (
  FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL,
  FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL, INDEX(item_type,updated_at)
 ) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS lead_magnets (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, user_id BIGINT UNSIGNED NOT NULL,
+ title VARCHAR(190) NOT NULL, magnet_type VARCHAR(80) NOT NULL, other_type VARCHAR(190) NULL,
+ target_audience TEXT NOT NULL, desired_outcome TEXT NULL, audience_problem TEXT NULL,
+ tone VARCHAR(120) NULL, call_to_action TEXT NULL, brand_requirements TEXT NULL, additional_instructions TEXT NULL,
+ content_html LONGTEXT NULL, status ENUM('draft','published','archived') NOT NULL DEFAULT 'draft',
+ public_slug VARCHAR(80) NULL UNIQUE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, published_at DATETIME NULL,
+ FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE, INDEX(status,updated_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS lead_magnet_messages (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, lead_magnet_id BIGINT UNSIGNED NOT NULL,
+ user_id BIGINT UNSIGNED NULL, role ENUM('user','assistant') NOT NULL, message LONGTEXT NOT NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(lead_magnet_id) REFERENCES lead_magnets(id) ON DELETE CASCADE,
+ FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL, INDEX(lead_magnet_id,created_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS crm_forms (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, slug VARCHAR(80) NOT NULL UNIQUE,
+ visibility ENUM('public','private') NOT NULL DEFAULT 'public', thank_you_message TEXT NOT NULL,
+ submit_label VARCHAR(120) NOT NULL DEFAULT 'Submit',
+ download_lead_magnet_id BIGINT UNSIGNED NULL, fixed_tag_ids JSON NULL, active BOOLEAN NOT NULL DEFAULT TRUE,
+ created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(download_lead_magnet_id) REFERENCES lead_magnets(id) ON DELETE SET NULL,
+ FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS crm_form_fields (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, form_id BIGINT UNSIGNED NOT NULL, field_key VARCHAR(80) NOT NULL,
+ field_type VARCHAR(30) NOT NULL, label VARCHAR(190) NOT NULL, placeholder VARCHAR(255) NULL,
+ options_json JSON NULL, crm_field VARCHAR(80) NULL, required BOOLEAN NOT NULL DEFAULT FALSE,
+ validation_pattern VARCHAR(255) NULL, calculation VARCHAR(500) NULL, position INT NOT NULL DEFAULT 0,
+ UNIQUE(form_id,field_key), FOREIGN KEY(form_id) REFERENCES crm_forms(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS crm_form_rules (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, form_id BIGINT UNSIGNED NOT NULL, target_field_id BIGINT UNSIGNED NULL,
+ source_field_id BIGINT UNSIGNED NOT NULL, operator VARCHAR(30) NOT NULL, comparison_value VARCHAR(500) NULL,
+ action ENUM('show','hide','tag') NOT NULL DEFAULT 'show', tag_id BIGINT UNSIGNED NULL,
+ FOREIGN KEY(form_id) REFERENCES crm_forms(id) ON DELETE CASCADE,
+ FOREIGN KEY(target_field_id) REFERENCES crm_form_fields(id) ON DELETE CASCADE,
+ FOREIGN KEY(source_field_id) REFERENCES crm_form_fields(id) ON DELETE CASCADE,
+ FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS crm_form_submissions (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, form_id BIGINT UNSIGNED NOT NULL, contact_id BIGINT UNSIGNED NULL,
+ values_json JSON NOT NULL, ip_hash CHAR(64) NOT NULL, submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(form_id) REFERENCES crm_forms(id) ON DELETE CASCADE,
+ FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE SET NULL, INDEX(form_id,submitted_at)
+) ENGINE=InnoDB;

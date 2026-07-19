@@ -1,0 +1,4 @@
+const form=document.querySelector('.public-form'),fields=[...document.querySelectorAll('.public-form-field')];
+function calculate(expr,data){let safe=String(expr||'').replace(/[A-Za-z_][A-Za-z0-9_]*/g,k=>Number(data[k]||0));if(!/^[0-9+\-*/().\s]+$/.test(safe))return '';try{return Function('"use strict";return ('+safe+')')()}catch{return ''}}
+function refresh(){const data=Object.fromEntries(new FormData(form));for(const f of fields){const k=f.dataset.conditionKey,a=data[k]??'',v=f.dataset.conditionValue,o=f.dataset.conditionOperator;f.hidden=k?!(o==='not_equals'?a!==v:o==='contains'?String(a).includes(v):o==='empty'?!a:o==='not_empty'?!!a:a===v):false;f.querySelectorAll('input,select,textarea').forEach(x=>x.disabled=f.hidden);const calc=f.querySelector('[data-calculation]');if(calc&&!f.hidden)calc.value=calculate(calc.dataset.calculation,{...data,...Object.fromEntries(new FormData(form))})}}
+form?.addEventListener('input',refresh);refresh();
