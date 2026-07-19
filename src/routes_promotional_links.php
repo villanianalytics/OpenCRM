@@ -25,7 +25,12 @@ if(preg_match('#^/go/([a-zA-Z0-9_-]{1,80})$#',$path,$m)&&$method==='GET'){
     if(!$link){http_response_code(404);header('Content-Type: text/plain; charset=UTF-8');exit('This promotional link is unavailable.');}
     $ua=substr((string)($_SERVER['HTTP_USER_AGENT']??''),0,1000);$ip=(string)($_SERVER['REMOTE_ADDR']??'');
     $visitor=hash_hmac('sha256',$ip.'|'.$ua,(string)config('key'));$referrer=substr((string)($_SERVER['HTTP_REFERER']??''),0,2000)?:null;
-    $query=$_GET;$utm=function(string $key)use($query):?string{$raw=$query[$key]??'';$value=is_scalar($raw)?trim((string)$raw):'';return $value===''?null:mb_substr($value,0,190);};
+    $query=$_GET;
+    if(!isset($query['utm_source'])&&$link['channel'])$query['utm_source']=$link['channel'];
+    if(!isset($query['utm_medium']))$query['utm_medium']='opencrm_promotional_link';
+    if(!isset($query['utm_campaign'])&&$link['campaign_name'])$query['utm_campaign']=$link['campaign_name'];
+    if(!isset($query['utm_content'])&&$link['variant'])$query['utm_content']=$link['variant'];
+    $utm=function(string $key)use($query):?string{$raw=$query[$key]??'';$value=is_scalar($raw)?trim((string)$raw):'';return $value===''?null:mb_substr($value,0,190);};
     try{db()->prepare('INSERT INTO promotional_link_clicks(promotional_link_id,visitor_hash,referrer,user_agent,device_type,utm_source,utm_medium,utm_campaign,query_json) VALUES(?,?,?,?,?,?,?,?,?)')->execute([$link['id'],$visitor,$referrer,$ua,promotional_device_type($ua),$utm('utm_source'),$utm('utm_medium'),$utm('utm_campaign'),$query?json_encode($query):null]);}
     catch(Throwable $e){app_log('error','Promotional link analytics could not be recorded',['promotional_link_id'=>(int)$link['id'],'error'=>$e->getMessage()]);}
     $destination=$link['destination_url'];if($query){$separator=str_contains($destination,'?')?'&':'?';$destination.=$separator.http_build_query($query);}
