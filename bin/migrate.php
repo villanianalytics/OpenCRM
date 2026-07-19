@@ -65,7 +65,7 @@ if(!in_array('channel',$promoColumns,true))db()->exec('ALTER TABLE promotional_l
 if(!in_array('variant',$promoColumns,true))db()->exec('ALTER TABLE promotional_links ADD variant VARCHAR(120) NULL AFTER channel');
 $roleRows=db()->query('SELECT id,permissions_json FROM roles')->fetchAll();$saveRole=db()->prepare('UPDATE roles SET permissions_json=? WHERE id=?');foreach($roleRows as $roleRow){$rp=json_decode((string)$roleRow['permissions_json'],true)?:[];$rp=array_values(array_unique(array_merge($rp,['promotional_links.view','promotional_links.edit','events.view'])));$saveRole->execute([json_encode($rp),$roleRow['id']]);}
 
-$permissions = json_encode(['contacts.view','contacts.edit','events.view','events.edit','reports.view','reports.edit','lead_magnets.view','lead_magnets.edit','forms.view','forms.edit']);
+$permissions = json_encode(['contacts.view','contacts.edit','events.view','events.edit','reports.view','reports.edit','lead_magnets.view','lead_magnets.edit','forms.view','forms.edit','promotional_links.view','promotional_links.edit','sites.view','sites.edit','bookings.view','bookings.edit']);
 $stmt = db()->prepare('INSERT INTO roles (name, permissions_json) VALUES (?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)');
 $stmt->execute(['Staff', $permissions]);
 $roleId = (int) db()->lastInsertId();

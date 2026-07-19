@@ -10,6 +10,8 @@ $catalog=[
  'lead_magnets'=>['Lead Magnet Generator','Generate, edit, publish, and download lead magnets'],
  'forms'=>['Form Generator','Build and publish forms'],
  'promotional_links'=>['QR codes and promotional links','Create tracked links, QR codes, and view analytics'],
+ 'sites'=>['Website and landing-page builder','Build, publish, and analyze websites'],
+ 'bookings'=>['Bookings','Manage calendars, meeting types, and appointments'],
 ];
 if($method==='POST'){
  verify_csrf();$roleId=(int)post('role_id');$role=db()->prepare('SELECT * FROM roles WHERE id=?');$role->execute([$roleId]);$row=$role->fetch();if(!$row){http_response_code(404);exit('Role not found');}
