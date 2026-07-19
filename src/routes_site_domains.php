@@ -6,7 +6,7 @@ function valid_site_hostname(string $host):bool{return (bool)preg_match('/^(?=.{
 
 $requestHost=normalized_hostname((string)($_SERVER['HTTP_HOST']??''));
 if($requestHost!==''&&!in_array($requestHost,[normalized_hostname((string)parse_url((string)config('url'),PHP_URL_HOST)),'www.'.normalized_hostname((string)parse_url((string)config('url'),PHP_URL_HOST))],true)){
- $q=db()->prepare("SELECT d.*,s.slug site_slug FROM site_domains d JOIN sites s ON s.id=d.site_id WHERE d.hostname=? AND d.status='active' AND s.status='published'");$q->execute([$requestHost]);if($domain=$q->fetch()){$originalPath=$path;$r=db()->prepare('SELECT target_url,http_status FROM site_redirects WHERE site_id=? AND source_path=? AND active=1');$r->execute([$domain['site_id'],$originalPath]);if($redirect=$r->fetch()){header('Location: '.$redirect['target_url'],true,(int)$redirect['http_status']);exit;}$path='/s/'.$domain['site_slug'].($originalPath==='/'?'':$originalPath);}
+ $q=db()->prepare("SELECT d.*,s.slug site_slug FROM site_domains d JOIN sites s ON s.id=d.site_id WHERE d.hostname=? AND d.status='active' AND s.status='published'");$q->execute([$requestHost]);if($domain=$q->fetch()){$originalPath=$path;$systemPath=preg_match('#^/(?:track/site|f/|book/|booking/|site-assets/)#',$originalPath);if(!$systemPath){$r=db()->prepare('SELECT target_url,http_status FROM site_redirects WHERE site_id=? AND source_path=? AND active=1');$r->execute([$domain['site_id'],$originalPath]);if($redirect=$r->fetch()){header('Location: '.$redirect['target_url'],true,(int)$redirect['http_status']);exit;}$path='/s/'.$domain['site_slug'].($originalPath==='/'?'':$originalPath);}}
 }
 
 if(preg_match('#^/sites/(\d+)/domains$#',$path,$m)){
