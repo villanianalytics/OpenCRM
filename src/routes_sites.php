@@ -2,7 +2,7 @@
 declare(strict_types=1);
 function site_row(int $id):array{$q=db()->prepare('SELECT * FROM sites WHERE id=?');$q->execute([$id]);$r=$q->fetch();if(!$r){http_response_code(404);exit('Site not found');}return $r;}
 function site_page_row(int $id):array{$q=db()->prepare('SELECT p.*,s.slug site_slug,s.name site_name,s.tracking_enabled,s.consent_mode FROM site_pages p JOIN sites s ON s.id=p.site_id WHERE p.id=?');$q->execute([$id]);$r=$q->fetch();if(!$r){http_response_code(404);exit('Page not found');}return $r;}
-function site_uuid():string{$b=random_bytes(16);$b[6]=chr((ord($b[6])&15)|64);$b[8]=chr((ord($b[8])&63)|128);return vsprintf('%s%s-%s-%s-%s-%s%s%s',str_split(bin2hex($b),4));}
+if(!function_exists('site_uuid')){function site_uuid():string{$b=random_bytes(16);$b[6]=chr((ord($b[6])&15)|64);$b[8]=chr((ord($b[8])&63)|128);return vsprintf('%s%s-%s-%s-%s-%s%s%s',str_split(bin2hex($b),4));}}
 if($path==='/track/site'&&$method==='POST'){
  header('Content-Type:application/json');$input=json_decode((string)file_get_contents('php://input'),true)?:[];$pageId=(int)($input['page_id']??0);$page=site_page_row($pageId);if(!$page['tracking_enabled']){echo '{}';exit;}
  $visitor=preg_match('/^[a-f0-9-]{36}$/',$_COOKIE['oc_vid']??'')?$_COOKIE['oc_vid']:site_uuid();$session=preg_match('/^[a-f0-9-]{36}$/',$_COOKIE['oc_sid']??'')?$_COOKIE['oc_sid']:site_uuid();setcookie('oc_vid',$visitor,['expires'=>time()+31536000,'path'=>'/','secure'=>!empty($_SERVER['HTTPS']),'httponly'=>true,'samesite'=>'Lax']);setcookie('oc_sid',$session,['expires'=>time()+1800,'path'=>'/','secure'=>!empty($_SERVER['HTTPS']),'httponly'=>true,'samesite'=>'Lax']);
