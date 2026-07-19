@@ -198,10 +198,7 @@ CREATE TABLE IF NOT EXISTS custom_field_conditions (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, custom_field_id BIGINT UNSIGNED NOT NULL,
  depends_on_field_id BIGINT UNSIGNED NOT NULL, operator ENUM('equals','not_equals','is_empty','not_empty') NOT NULL DEFAULT 'equals', expected_value TEXT NULL,
  FOREIGN KEY(custom_field_id) REFERENCES custom_fields(id) ON DELETE CASCADE,
- FOÛ›-¢Gß≤⁄Óù∆≠y”CADE,
- INDEX(promotional_link_id,clicked_at), INDEX(promotional_link_id,visitor_hash)
-) ENGINE=InnoDB;
-CREATE TABLE IF NOT EXISTS knowledge_base_items (
+ FO˜nm¢Gß≤⁄Óù∆≠y“EATE TABLE IF NOT EXISTS knowledge_base_items (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, title VARCHAR(190) NOT NULL,
  item_type ENUM('text','file') NOT NULL DEFAULT 'text', body LONGTEXT NULL,
  stored_name VARCHAR(255) NULL, original_name VARCHAR(255) NULL, mime_type VARCHAR(120) NULL,
@@ -375,6 +372,7 @@ CREATE TABLE IF NOT EXISTS booking_notification_log (
 CREATE TABLE IF NOT EXISTS calendar_connections (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, user_id BIGINT UNSIGNED NOT NULL, provider ENUM('google','microsoft','caldav') NOT NULL,
  account_email VARCHAR(190) NULL, access_token_enc LONGTEXT NULL, refresh_token_enc LONGTEXT NULL, expires_at DATETIME NULL,
- external_calendar_id VARCHAR(500) NULL, active BOOLEAN NOT NULL DEFAULT TRUE, last_sync_at DATETIME NULL,
+ external_calendar_id VARCHAR(500) NULL, active BOOLEAN NOT NULL DEFAULT TRUE, sync_status ENUM('pending','healthy','error') NOT NULL DEFAULT 'pending',
+ last_error VARCHAR(500) NULL, last_sync_at DATETIME NULL,
  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id,provider,account_email), FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
