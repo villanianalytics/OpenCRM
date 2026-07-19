@@ -114,6 +114,12 @@ CREATE TABLE IF NOT EXISTS application_logs (
  ip_address VARCHAR(45) NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL, INDEX(level,created_at), INDEX(created_at)
 ) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS operational_alert_states (
+ alert_key VARCHAR(120) PRIMARY KEY, current_status ENUM('healthy','warning','error') NOT NULL DEFAULT 'healthy',
+ consecutive_failures INT UNSIGNED NOT NULL DEFAULT 0, last_message VARCHAR(1000) NULL,
+ last_notified_at DATETIME NULL, last_checked_at DATETIME NOT NULL,
+ recovered_at DATETIME NULL, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS app_settings (
  setting_key VARCHAR(80) PRIMARY KEY, setting_value TEXT NULL,
  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -197,6 +203,287 @@ CREATE TABLE IF NOT EXISTS custom_fields (
 CREATE TABLE IF NOT EXISTS custom_field_conditions (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, custom_field_id BIGINT UNSIGNED NOT NULL,
  depends_on_field_id BIGINT UNSIGNED NOT NULL, operator ENUM('equals','not_equals','is_empty','not_empty') NOT NULL DEFAULT 'equals', expected_value TEXT NULL,
- FOREIGN KEY(custom_field_id) REFERENCES custom_fmüÓn-¢G§²ÚîÆ­yÝ¸øðýÁ¡À•¹‘¥˜üøð½Í•±•Ðøð½±…‰•°øñ‘¥Øøñ‰ÕÑÑ½¸ù¥±Ñ•Èð½‰ÕÑÑ½¸øð½‘¥Øøð½™½É´øñ‘¥Ø±…ÍÌô‰…ÉˆøñÑ…‰±”øñÑ¡•…øñÑÈøñÑ ù9…µ”ð½Ñ øñÑ ù½µÁ…¹äð½Ñ øñÑ ùµ…¥°ð½Ñ øñÑ ùQ…Ìð½Ñ øñÑ ù1…ÍÐÕÁ‘…Ñ•ð½Ñ øð½ÑÈøð½Ñ¡•…øñÑ‰½‘äøðýÁ¡À™½É•…  ‘É½ÝÌ…Ì€‘Œ¤èüøñÑÈøñÑøñ„¡É•˜ôˆ½½¹Ñ…ÑÌ¼ðüô‘l¥tüøˆøðüõ” ‘l™¥ÉÍÑ}¹…µ”t¸œ€œ¸‘l±…ÍÑ}¹…µ”t¤üøð½„øð½ÑøñÑøðüõ” ‘l½µÁ…¹ät¤üøð½ÑøñÑøðüõ” ‘l•µ…¥°t¤üøð½ÑøñÑøðýÁ¡À™½É•… ¡½¹Ñ…Ñ}Ñ…Ì ¡¥¹Ð¤‘l¥t¤…Ì€‘Ð¥¥˜¡Ñ…}…•ÍÌ ¡¥¹Ð¤‘Ñl¥t¤„ôô¡¥‘‘•¸œ¤èüøñÍÁ…¸±…ÍÌô‰Ñ…œˆÍÑå±”ô‰‰…­É½Õ¹èðüõ” ‘Ñl½±½Èt¤üøˆøðüõ” ‘Ñl¹…µ”t¤üøð½ÍÁ…¸øðýÁ¡À•¹‘¥˜üøð½ÑøñÑøðüõ” ‘lÕÁ‘…Ñ•‘}…Ðt¤üøð½Ñøð½ÑÈøðýÁ¡À•¹‘™½É•… üøð½Ñ‰½‘äøð½Ñ…‰±”øð½‘¥ØøðýÁ¡Àô¤í•á¥Ðìô()¥˜ ‘Á…Ñ ôôôœ½½¹Ñ…ÑÌ½¹•ÜœñðÁÉ•}µ…Ñ  œx½½¹Ñ…ÑÌ¼¡q¬¤½•‘¥ÐŒœ°‘Á…Ñ °‘´¤¥íÉ•ÅÕ¥É•}Á•Éµ¥ÍÍ¥½¸ ½¹Ñ…ÑÌ¹•‘¥Ðœ¤ì‘¥õ¥ÍÍ•Ð ‘µlÅt¤ü¡¥¹Ð¤‘µlÅté¹Õ±°ì‘¥Í9•Üô‘¥ôôõ¹Õ±°ì‘Œô‘¥ý½¹Ñ…Ñ}É½Ü ‘¥¤émtí¥˜ ‘¥˜™½¹Ñ…Ñ}…•ÍÌ ‘¥¤„ôôÝÉ¥Ñ”œ¥í¡ÑÑÁ}É•ÍÁ½¹Í•}½‘” ÐÀÌ¤í•á¥Ð I•…µ½¹±ä½¹Ñ…Ðœ¤íõ¥˜ ‘¥¥É•ÅÕ¥É•}É•½É‘}•‘¥Ð ‘Œ¤ì(¥˜ ‘µ•Ñ¡½ôôôA=MPœ¥íÙ•É¥™å}ÍÉ˜ ¤í¥˜ ‘¥¥É•ÅÕ¥É•}É•½É‘}•‘¥Ð ‘Œ¤ì‘Ù…±ÌõmÑÉ¥´¡Á½ÍÐ ™¥ÉÍÑ}¹…µ”œ¤¤±ÑÉ¥´¡Á½ÍÐ ±…ÍÑ}¹…µ”œ¤¤±ÑÉ¥´¡Á½ÍÐ ½µÁ…¹äœ¤¤±ÑÉ¥´¡Á½ÍÐ ©½‰}Ñ¥Ñ±”œ¤¤±ÑÉ¥´¡Á½ÍÐ •µ…¥°œ¤¤±ÑÉ¥´¡Á½ÍÐ Á¡½¹”œ¤¤±ÑÉ¥´¡Á½ÍÐ …‘‘É•ÍÌœ¤¤±ÑÉ¥´¡Á½ÍÐ Ý•‰Í¥Ñ”œ¤¥tí¥˜ „‘Ù…±ÍlÁuñð„‘Ù…±ÍlÅt¥í™±…Í  •ÉÉ½Èœ°¥ÉÍÐ…¹±…ÍÐ¹…µ”…É”É•ÅÕ¥É•¸œ¤íõ•±Í•í¥˜ ‘¥¥ì‘Ù…±Ímtô‘¥í‘ˆ ¤´ùÁÉ•Á…É” UAQ½¹Ñ…ÑÌMP™¥ÉÍÑ}¹…µ”ôü±±…ÍÑ}¹…µ”ôü±½µÁ…¹äôü±©½‰}Ñ¥Ñ±”ôü±•µ…¥°ôü±Á¡½¹”ôü±…‘‘É•ÍÌôü±Ý•‰Í¥Ñ”ôü]!I¥ôüœ¤´ù•á•ÕÑ” ‘Ù…±Ì¤íõ•±Í•ì‘Ù…±ÍmtõÕÍ•È ¥l¥tì‘Ù…±ÍmtõÕÍ•È ¥l¥tí‘ˆ ¤´ùÁÉ•Á…É” %9MIP%9Q<½¹Ñ…ÑÌ¡™¥ÉÍÑ}¹…µ”±±…ÍÑ}¹…µ”±½µÁ…¹ä±©½‰}Ñ¥Ñ±”±•µ…¥°±Á¡½¹”±…‘‘É•ÍÌ±Ý•‰Í¥Ñ”±É•…Ñ•‘}‰ä±½Ý¹•É}¥¤Y1UL ü°ü°ü°ü°ü°ü°ü°ü°ü°ü¤œ¤´ù•á•ÕÑ” ‘Ù…±Ì¤ì‘¥ô¡¥¹Ð¥‘ˆ ¤´ù±…ÍÑ%¹Í•ÉÑ% ¤íõ‘ˆ ¤´ùÁÉ•Á…É” UAQ½¹Ñ…ÑÌMP…Ñ¥Ù”ôü]!I¥ôüœ¤´ù•á•ÕÑ”¡mÁ½ÍÐ …Ñ¥Ù”œ¤üÄèÀ°‘¥‘t¤íÍå¹}½¹Ñ…Ñ}½µÁ…¹ä ‘¥°¡ÍÑÉ¥¹œ¤‘Ù…±ÍlÉt¤íÍå¹}Ñ…Ì ‘¥°¡…ÉÉ…ä¥Á½ÍÐ Ñ…Ìœ±mt¤¤í¥˜ ‘¥Í9•Ü¥…ÁÁ±å}ÕÍ•É}‘•™…Õ±Ñ}Ñ…Ì ‘¥±ÕÍ•È ¥l¥t¤íÍ…Ù•}½¹Ñ…Ñ}ÕÍÑ½µ}Ù…±Õ•Ì ‘¥°¡…ÉÉ…ä¥Á½ÍÐ ÕÍÑ½µ}™¥•±‘Ìœ±mt¤¤í¥˜ ‘Œ¥ì‘…™Ñ•ÉMÑµÐõ‘ˆ ¤´ùÁÉ•Á…É” M1P€¨I=4½¹Ñ…ÑÌ]!I¥ôüœ¤ì‘…™Ñ•ÉMÑµÐ´ù•á•ÕÑ”¡l‘¥‘t¤íÉ•½É‘}½¹Ñ…Ñ}¡…¹•Ì ‘¥°‘Œ°‘…™Ñ•ÉMÑµÐ´ù™•Ñ  ¤üémt¤íõ…Õ‘¥Ð ‘ŒüÕÁ‘…Ñ”œèÉ•…Ñ”œ°½¹Ñ…Ðœ°‘¥±l…Ñ¥Ù”œôùÁ½ÍÐ …Ñ¥Ù”œ¤üÄèÁt¤í™±…Í  ÍÕ•ÍÌœ°½¹Ñ…ÐÍ…Ù•¸œ¤íÉ•‘¥É•Ð œ½½¹Ñ…ÑÌ¼œ¸‘¥¤íõô(±…å½ÕÐ ‘¥ü‘¥Ð½¹Ñ…Ðœè9•Ü½¹Ñ…Ðœ±™Õ¹Ñ¥½¸ ¥ÕÍ” ‘Œ°‘¥¥ì‘Í•±•Ñ•ô‘¥ý…ÉÉ…å}½±Õµ¸¡½¹Ñ…Ñ}Ñ…Ì ‘¥¤°¥œ¤émtí¥˜ „‘¥¥ì‘‘•™…Õ±ÑMÑµÐõ‘ˆ ¤´ùÁÉ•Á…É” M1PÑ…}¥I=4ÕÍ•É}‘•™…Õ±Ñ}Ñ…Ì]!IÕÍ•É}¥ôüœ¤ì‘‘•™…Õ±ÑMÑµÐ´ù•á•ÕÑ”¡mÕÍ•È ¥l¥ut¤ì‘Í•±•Ñ•ô‘‘•™…Õ±ÑMÑµÐ´ù™•Ñ¡±°¡A<èéQ!}=1U58¤íô‘Ñ…É½ÕÁÌõmtí™½É•… ¡…±±}Ñ…Ì ¤…Ì€‘Ñ…œ¥¥˜¡Ñ…}…•ÍÌ ¡¥¹Ð¤‘Ñ…l¥t¤ôôôÝÉ¥Ñ”œ¤‘Ñ…É½ÕÁÍl‘Ñ…lÉ½ÕÁ}¹…µ”tüüU¹É½ÕÁ•umtô‘Ñ…œì‘Ñ…É½ÕÁÍlU¹É½ÕÁ•tüüõmtìüøñ Äøðüô‘¥ü‘¥Ð½¹Ñ…Ðœè9•Ü½¹Ñ…Ðœüøð½ Äøñ™½É´±…ÍÌô‰…Éˆ¥ô‰½¹Ñ…Ðµ™½É´ˆµ•Ñ¡½ô‰Á½ÍÐˆ‘…Ñ„µ½¹Ñ…Ðµ¥ôˆðüõ” ‘¥üèÀ¤üøˆøñ¥¹ÁÕÐÑåÁ”ô‰¡¥‘‘•¸ˆ¹…µ”ô‰}ÍÉ˜ˆÙ…±Õ”ôˆðüõÍÉ˜ ¤üøˆøñ‘¥Ø±…ÍÌô‰™½É´µÉ¥ˆøðýÁ¡À™½É•… ¡l™¥ÉÍÑ}¹…µ”œôø¥ÉÍÐ¹…µ”œ°±…ÍÑ}¹…µ”œôø1…ÍÐ¹…µ”œ°½µÁ…¹äœôø½µÁ…¹äœ°©½‰}Ñ¥Ñ±”œôø)½ˆÑ¥Ñ±”œ°•µ…¥°œôøµ…¥°œ°Á¡½¹”œôøA¡½¹”œ°Ý•‰Í¥Ñ”œôø]•‰Í¥Ñ”t…Ì€‘¬ôø‘±…‰•°¤èüøñ±…‰•°øðüô‘±…‰•°üøñ¥¹ÁÕÐ¹…µ”ôˆðüô‘¬üøˆÙ…±Õ”ôˆðüõ” ‘l‘­tüüœœ¤üøˆ€ðüô‘¬ôôô™¥ÉÍÑ}¹…µ”ñð‘¬ôôô±…ÍÑ}¹…µ”œüÉ•ÅÕ¥É•œèœœüøøðýÁ¡À¥˜ ‘¬ôôô½µÁ…¹äœ¤èüøñ‘¥Ø¥ô‰½µÁ…¹äµÍÕ•ÍÑ¥½¹Ìˆ±…ÍÌô‰½µÁ…¹äµÍÕ•ÍÑ¥½¹Ìˆ¡¥‘‘•¸øð½‘¥ØøðýÁ¡À•¹‘¥˜üøð½±…‰•°øðýÁ¡À•¹‘™½É•… üøñ±…‰•°±…ÍÌô‰™Õ±°ˆù‘‘É•ÍÌñÑ•áÑ…É•„¹…µ”ô‰…‘‘É•ÍÌˆøðüõ” ‘l…‘‘É•ÍÌtüüœœ¤üøð½Ñ•áÑ…É•„øð½±…‰•°øñ‘¥Ø±…ÍÌô‰™Õ±°ˆøñÍÁ…¸±…ÍÌô‰µÕÑ•ˆùQ…Ìð½ÍÁ…¸øñ‘¥Ø±…ÍÌô‰ÅÕ¥¬µÑ…œˆøñ¥¹ÁÕÐ¥ô‰¹•ÜµÑ…œµ¹…µ”ˆÑåÁ”ô‰Ñ•áÐˆÁ±…•¡½±‘•Èô‰9•ÜÑ…œ¹…µ”ˆøñ¥¹ÁÕÐ¥ô‰¹•ÜµÑ…œµ½±½ÈˆÑåÁ”ô‰½±½ÈˆÙ…±Õ”ôˆŒÄÔØÕŒÀˆ…É¥„µ±…‰•°ô‰Q…œ½±½Èˆøñ‰ÕÑÑ½¸ÑåÁ”ô‰‰ÕÑÑ½¸ˆ¥ô‰É•…Ñ”µÑ…œˆ±…ÍÌô‰Í•½¹‘…ÉäˆùÉ•…Ñ”Ñ…œð½‰ÕÑÑ½¸øñÍÁ…¸¥ô‰Ñ…œµµ•ÍÍ…”ˆ±…ÍÌô‰µÕÑ•ˆøð½ÍÁ…¸øð½‘¥Øøñ±…‰•°ùM•…É Ñ…Ìñ¥¹ÁÕÐ¥ô‰Ñ…œµÍ•…É ˆÑåÁ”ô‰Í•…É ˆÁ±…•¡½±‘•Èô‰QåÁ”Ñ¼™¥±Ñ•ÈÑ…Ì½ÈÉ½ÕÁÌˆøð½±…‰•°øñ‘¥Ø±…ÍÌô‰Ñ…œµÑÉ•”ˆ¥ô‰½¹Ñ…ÐµÑ…ÌˆøðýÁ¡À™½É•…  ‘Ñ…É½ÕÁÌ…Ì€‘É½ÕÀôø‘É½ÕÁQ…Ì¤èüøñ‘•Ñ…¥±Ì‘…Ñ„µÑ…œµÉ½ÕÀ€ðüõ…ÉÉ…å}¥¹Ñ•ÉÍ•Ð¡…ÉÉ…å}µ…À¡™¸ ‘¥Ñ•´¤ôø¡¥¹Ð¤‘¥Ñ•µl¥t°‘É½ÕÁQ…Ì¤±…ÉÉ…å}µ…À ¥¹ÑÙ…°œ°‘Í•±•Ñ•¤¤ü½Á•¸œèœœüøøñÍÕµµ…ÉäøñÍÁ…¸±…ÍÌô‰™½±‘•Èµ¥½¸ˆûŠZàð½ÍÁ…¸ø€ðüõ” ‘É½ÕÀ¤üø€ñÍÁ…¸±…ÍÌô‰µÕÑ•ˆø ðüõ½Õ¹Ð ‘É½ÕÁQ…Ì¤üø¤ð½ÍÁ…¸øð½ÍÕµµ…Éäøñ‘¥Ø±…ÍÌô‰¡•­‰½á•Ìˆ€ðüô‘É½ÕÀôôôU¹É½ÕÁ•œü¥ô‰Ñ…œµÉ½ÕÀµÕ¹É½ÕÁ•ˆœèœœüøøðýÁ¡À™½É•…  ‘É½ÕÁQ…Ì…Ì€‘Ð¤èüøñ±…‰•°‘…Ñ„µÑ…œµÑ•áÐôˆðüõ”¡µ‰}ÍÑÉÑ½±½Ý•È ‘Ñl¹…µ”t¸œ€œ¸‘É½ÕÀ¤¤üøˆøñ¥¹ÁÕÐÑåÁ”ô‰¡•­‰½àˆ¹…µ”ô‰Ñ…ÍmtˆÙ…±Õ”ôˆðüô‘Ñl¥tüøˆ€ðüõ¥¹}…ÉÉ…ä ‘Ñl¥t°‘Í•±•Ñ•¤ü¡•­•œèœœüøøðüõ” ‘Ñl¹…µ”t¤üøð½±…‰•°øðýÁ¡À•¹‘™½É•… üøð½‘¥Øøð½‘•Ñ…¥±ÌøðýÁ¡À•¹‘™½É•… üøð½‘¥ØøðýÁ¡ÀÉ•¹‘•É}½¹Ñ…Ñ}ÕÍÑ½µ}™¥•±‘Ì ‘¥±…ÉÉ…å}µ…À ¥¹ÑÙ…°œ°‘Í•±•Ñ•¤¤ìüøð½‘¥Øøð½‘¥Øøñ‘¥Ø¥ô‰‘ÕÁ±¥…Ñ”µÝ…É¹¥¹œˆ±…ÍÌô‰™±…Í •ÉÉ½Èˆ¡¥‘‘•¸øð½‘¥Øøñ‰Èøñ‰ÕÑÑ½¸ùM…Ù”½¹Ñ…Ðð½‰ÕÑÑ½¸øð½™½É´øñÍÉ¥ÁÐù™Õ¹Ñ¥½¸ÕÁ‘…Ñ•½¹‘¥Ñ¥½¹…±¥•±‘Ì ¥í½¹ÍÐÍ•±•Ñ•õl¸¸¹‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½É±° ˆ½¹Ñ…ÐµÑ…Ì¥¹ÁÕÐé¡•­•ˆ¥t¹µ…À¡¤ôù¤¹Ù…±Õ”¤í‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½É±° ˆ¹ÕÍÑ½´µ™¥•±ˆ¤¹™½É… ¡™¥•±ôùí½¹ÍÐÉ•ÅÕ¥É•õ™¥•±¹‘…Ñ…Í•Ð¹½¹‘¥Ñ¥½¹Q…Ìý™¥•±¹‘…Ñ…Í•Ð¹½¹‘¥Ñ¥½¹Q…Ì¹ÍÁ±¥Ð ˆ°ˆ¤émtí½¹ÍÐÍ¡½Üô…É•ÅÕ¥É•¹±•¹Ñ¡ññÉ•ÅÕ¥É•¹Í½µ”¡¥ôùÍ•±•Ñ•¹¥¹±Õ‘•Ì¡¥¤¤í™¥•±¹¡¥‘‘•¸ô…Í¡½Üí™¥•±¹ÅÕ•ÉåM•±•Ñ½É±° ‰¥¹ÁÕÐ±Í•±•Ð±Ñ•áÑ…É•„ˆ¤¹™½É… ¡¥¹ÁÕÐôù¥¹ÁÕÐ¹‘¥Í…‰±•ô…Í¡½Ü¥ô¥õ‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½È ˆ½¹Ñ…ÐµÑ…Ìˆ¤ü¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰¡…¹”ˆ±ÕÁ‘…Ñ•½¹‘¥Ñ¥½¹…±¥•±‘Ì¤íÕÁ‘…Ñ•½¹‘¥Ñ¥½¹…±¥•±‘Ì ¤í‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½È ˆÑ…œµÍ•…É ˆ¤ü¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰¥¹ÁÕÐˆ±”ôùí½¹ÍÐÄõ”¹Ñ…É•Ð¹Ù…±Õ”¹Ñ½1½Ý•É…Í” ¤í‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½É±° ˆ½¹Ñ…ÐµÑ…Ìm‘…Ñ„µÑ…œµÉ½ÕÁtˆ¤¹™½É… ¡É½ÕÀôùí±•Ðµ…Ñ¡•ÌôÀíÉ½ÕÀ¹ÅÕ•ÉåM•±•Ñ½É±° ‰±…‰•°ˆ¤¹™½É… ¡±…‰•°ôùí±…‰•°¹¡¥‘‘•¸ô…±…‰•°¹‘…Ñ…Í•Ð¹Ñ…Q•áÐ¹¥¹±Õ‘•Ì¡Ä¤í¥˜ …±…‰•°¹¡¥‘‘•¸¥µ…Ñ¡•Ì¬­ô¤íÉ½ÕÀ¹¡¥‘‘•¸ô…µ…Ñ¡•Ìí¥˜¡Ä˜™µ…Ñ¡•Ì¥É½ÕÀ¹½Á•¸õÑÉÕ•ô¥ô¤í‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½È ˆÉ•…Ñ”µÑ…œˆ¤ü¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰±¥¬ˆ±…Íå¹Œ ¤ôùí½¹ÍÐ¸õ‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½È ˆ¹•ÜµÑ…œµ¹…µ”ˆ¤±Œõ‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½È ˆ¹•ÜµÑ…œµ½±½Èˆ¤±´õ‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½È ˆÑ…œµµ•ÍÍ…”ˆ¤±ˆõ‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½È ˆÉ•…Ñ”µÑ…œˆ¤í¥˜ …¸¹Ù…±Õ”¹ÑÉ¥´ ¤¥í´¹Ñ•áÑ½¹Ñ•¹Ðô‰¹Ñ•È„Ñ…œ¹…µ”¸ˆíÉ•ÑÕÉ¹õˆ¹‘¥Í…‰±•õÑÉÕ”í´¹Ñ•áÑ½¹Ñ•¹Ðô‰É•…Ñ¥¹ŸŠ˜ˆí½¹ÍÐ‰½‘äõ¹•ÜUI1M•…É¡A…É…µÌ¡í}ÍÉ˜èˆðüõÍÉ˜ ¤üøˆ±¹…µ”é¸¹Ù…±Õ”¹ÑÉ¥´ ¤±½±½ÈéŒ¹Ù…±Õ•ô¤íÑÉåí½¹ÍÐÈõ…Ý…¥Ð™•Ñ  ˆ½…Á¤½Ñ…Ìˆ±íµ•Ñ¡½è‰A=MPˆ±¡•…‘•ÉÌéì‰½¹Ñ•¹ÐµQåÁ”ˆè‰…ÁÁ±¥…Ñ¥½¸½àµÝÝÜµ™½É´µÕÉ±•¹½‘•‰ô±‰½‘åô¤í½¹ÍÐõ…Ý…¥ÐÈ¹©Í½¸ ¤í¥˜ …È¹½¬¥Ñ¡É½Ü¹•ÜÉÉ½È¡¹•ÉÉ½Éñð‰½Õ±¹½ÐÉ•…Ñ”Ñ…œ¸ˆ¤í½¹ÍÐ±…‰•°õ‘½Õµ•¹Ð¹É•…Ñ•±•µ•¹Ð ‰±…‰•°ˆ¤±‰½àõ‘½Õµ•¹Ð¹É•…Ñ•±•µ•¹Ð ‰¥¹ÁÕÐˆ¤í‰½à¹ÑåÁ”ô‰¡•­‰½àˆí‰½à¹¹…µ”ô‰Ñ…Ímtˆí‰½à¹Ù…±Õ”õ¹¥í‰½à¹¡•­•õÑÉÕ”í±…‰•°¹‘…Ñ…Í•Ð¹Ñ…Q•áÐõ¹¹…µ”¹Ñ½1½Ý•É…Í” ¤¬ˆÕ¹É½ÕÁ•ˆí±…‰•°¹…ÁÁ•¹¡‰½à±‘½Õµ•¹Ð¹É•…Ñ•Q•áÑ9½‘”¡¹¹…µ”¤¤í‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½È ˆÑ…œµÉ½ÕÀµÕ¹É½ÕÁ•ˆ¤¹…ÁÁ•¹¡±…‰•°¤í½¹ÍÐÕ¹É½ÕÁ•õ‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½È ˆÑ…œµÉ½ÕÀµÕ¹É½ÕÁ•ˆ¤¹±½Í•ÍÐ ‰‘•Ñ…¥±Ìˆ¤íÕ¹É½ÕÁ•¹¡¥‘‘•¸õ™…±Í”íÕ¹É½ÕÁ•¹½Á•¸õÑÉÕ”íÕÁ‘…Ñ•½¹‘¥Ñ¥½¹…±¥•±‘Ì ¤í¸¹Ù…±Õ”ôˆˆí´¹Ñ•áÑ½¹Ñ•¹Ðô‰Q…œÉ•…Ñ•…¹Í•±•Ñ•¸‰õ…Ñ ¡”¥í´¹Ñ•áÑ½¹Ñ•¹Ðõ”¹µ•ÍÍ…•õ™¥¹…±±åíˆ¹‘¥Í…‰±•õ™…±Í•õô¤ìð½ÍÉ¥ÁÐøñÍÉ¥ÁÐø  ¤ôùí½¹ÍÐ¥¹ÁÕÐõ‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½È ‰m¹…µ”õ½µÁ…¹åtˆ¤±Á…¹•°õ‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½È ˆ½µÁ…¹äµÍÕ•ÍÑ¥½¹Ìˆ¤í¥˜ …¥¹ÁÕÑñð…Á…¹•°¥É•ÑÕÉ¸í±•ÐÑ¥µ•È±É•ÅÕ•ÍÐí¥¹ÁÕÐ¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰¥¹ÁÕÐˆ° ¤ôùí±•…ÉQ¥µ•½ÕÐ¡Ñ¥µ•È¤íÁ…¹•°¹¡¥‘‘•¸õÑÉÕ”í¥˜¡¥¹ÁÕÐ¹Ù…±Õ”¹ÑÉ¥´ ¤¹±•¹Ñ ðÈ¥É•ÑÕÉ¸íÑ¥µ•ÈõÍ•ÑQ¥µ•½ÕÐ¡…Íå¹Œ ¤ôùíÉ•ÅÕ•ÍÐü¹…‰½ÉÐ ¤íÉ•ÅÕ•ÍÐõ¹•Ü‰½ÉÑ½¹ÑÉ½±±•È ¤íÑÉåí½¹ÍÐ‘…Ñ„õ…Ý…¥Ð™•Ñ  ˆ½…Á¤½½µÁ…¹äµÍÕ•ÍÑ¥½¹ÌýÄôˆ­•¹½‘•UI%½µÁ½¹•¹Ð¡¥¹ÁÕÐ¹Ù…±Õ”¹ÑÉ¥´ ¤¤±íÍ¥¹…°éÉ•ÅÕ•ÍÐ¹Í¥¹…±ô¤¹Ñ¡•¸¡ÈôùÈ¹©Í½¸ ¤¤í¥˜ …‘…Ñ„¹ÍÕ•ÍÑ¥½¹Ì¹±•¹Ñ ¥É•ÑÕÉ¸íÁ…¹•°¹É•Á±…•¡¥±‘É•¸ ¤í½¹ÍÐÑ¥Ñ±”õ‘½Õµ•¹Ð¹É•…Ñ•±•µ•¹Ð ‰ÍÑÉ½¹œˆ¤íÑ¥Ñ±”¹Ñ•áÑ½¹Ñ•¹Ðô‰¥å½Ôµ•…¸üˆíÁ…¹•°¹…ÁÁ•¹¡Ñ¥Ñ±”¤í‘…Ñ„¹ÍÕ•ÍÑ¥½¹Ì¹™½É… ¡Ìôùí½¹ÍÐ‰ÕÑÑ½¸õ‘½Õµ•¹Ð¹É•…Ñ•±•µ•¹Ð ‰‰ÕÑÑ½¸ˆ¤í‰ÕÑÑ½¸¹ÑåÁ”ô‰‰ÕÑÑ½¸ˆí‰ÕÑÑ½¸¹±…ÍÍ9…µ”ô‰½µÁ…¹äµ¡½¥”ˆí‰ÕÑÑ½¸¹Ñ•áÑ½¹Ñ•¹ÐõÌ¹¹…µ”¬ˆ€ ˆ­Ì¹½¹Ñ…ÑÌ¬ˆ½¹Ñ…Ðˆ¬¡Ì¹½¹Ñ…ÑÌôôôÄüˆˆè‰Ìˆ¤¬ˆ¤ˆí‰ÕÑÑ½¸¹½¹±¥¬ô ¤ôùí¥¹ÁÕÐ¹Ù…±Õ”õÌ¹¹…µ”íÁ…¹•°¹¡¥‘‘•¸õÑÉÕ•ôíÁ…¹•°¹…ÁÁ•¹¡‰ÕÑÑ½¸¥ô¤í½¹ÍÐ­••Àõ‘½Õµ•¹Ð¹É•…Ñ•±•µ•¹Ð ‰‰ÕÑÑ½¸ˆ¤í­••À¹ÑåÁ”ô‰‰ÕÑÑ½¸ˆí­••À¹±…ÍÍ9…µ”ô‰½µÁ…¹äµ­••Àˆí­••À¹Ñ•áÑ½¹Ñ•¹Ðô‰-••ÀƒŠpˆ­¥¹ÁÕÐ¹Ù…±Õ”¹ÑÉ¥´ ¤¬‹Št…Ì„¹•Ü½µÁ…¹äˆí­••À¹½¹±¥¬ô ¤ôùÁ…¹•°¹¡¥‘‘•¸õÑÉÕ”íÁ…¹•°¹…ÁÁ•¹¡­••À¤íÁ…¹•°¹¡¥‘‘•¸õ™…±Í•õ…Ñ ¡”¥í¥˜¡”¹¹…µ”„ôô‰‰½ÉÑÉÉ½Èˆ¥Á…¹•°¹¡¥‘‘•¸õÑÉÕ•õô°ÌÔÀ¥ô¥ô¤ ¤ìð½ÍÉ¥ÁÐøñÍÉ¥ÁÐø  ¤ôùí½¹ÍÐ™½É´õ‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½È œ½¹Ñ…Ðµ™½É´œ¤±Ý…É¹¥¹œõ‘½Õµ•¹Ð¹ÅÕ•ÉåM•±•Ñ½È œ‘ÕÁ±¥…Ñ”µÝ…É¹¥¹œœ¤í™½É´ü¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ÍÕ‰µ¥Ðœ±…Íå¹Œ”ôùí¥˜¡™½É´¹‘…Ñ…Í•Ð¹‘ÕÁ±¥…Ñ•½¹™¥Éµ•¥É•ÑÕÉ¸í”¹ÁÉ•Ù•¹Ñ•™…Õ±Ð ¤í½¹ÍÐÀõ¹•ÜUI1M•…É¡A…É…µÌ¡í•á±Õ‘”é™½É´¹‘…Ñ…Í•Ð¹½¹Ñ…Ñ%±™¥ÉÍÑ}¹…µ”é™½É´¹™¥ÉÍÑ}¹…µ”¹Ù…±Õ”±±…ÍÑ}¹…µ”é™½É´¹±…ÍÑ}¹…µ”¹Ù…±Õ”±•µ…¥°é™½É´¹•µ…¥°¹Ù…±Õ”±Á¡½¹”é™½É´¹Á¡½¹”¹Ù…±Õ•ô¤í½¹ÍÐ‘…Ñ„õ…Ý…¥Ð™•Ñ  œ½…Á¤½½¹Ñ…Ðµ‘ÕÁ±¥…Ñ•Ìüœ­À¤¹Ñ¡•¸¡ÈôùÈ¹©Í½¸ ¤¤í¥˜ …‘…Ñ„¹‘ÕÁ±¥…Ñ•Ì¹±•¹Ñ ¥í™½É´¹‘…Ñ…Í•Ð¹‘ÕÁ±¥…Ñ•½¹™¥Éµ•ôœÄœí™½É´¹É•ÅÕ•ÍÑMÕ‰µ¥Ð ¤íÉ•ÑÕÉ¹õ½¹ÍÐ±¥¹•Ìõ‘…Ñ„¹‘ÕÁ±¥…Ñ•Ì¹µ…À¡ôù¹¹…µ”¬¡¹½µÁ…¹äüœƒŠP€œ­¹½µÁ…¹äèœœ¤¬¡¹•µ…¥°üœƒŠP€œ­¹•µ…¥°èœœ¤¤í¥˜¡½¹™¥É´ A½ÍÍ¥‰±”‘ÕÁ±¥…Ñ”½¹Ñ…Ð¡Ì¤™½Õ¹éq¹q¸œ­±¥¹•Ì¹©½¥¸ q¸œ¤¬q¹q¹¡½½Í”=,Ñ¼É•…Ñ”½ÕÁ‘…Ñ”Ñ¡¥Ì½¹Ñ…Ð…¹åÝ…ä°½È…¹•°Ñ¼É•Ù¥•Ü¸œ¤¥í™½É´¹‘…Ñ…Í•Ð¹‘ÕÁ±¥…Ñ•½¹™¥Éµ•ôœÄœí™½É´¹É•ÅÕ•ÍÑMÕ‰µ¥Ð ¥õ•±Í•íÝ…É¹¥¹œ¹É•Á±…•¡¥±‘É•¸¡‘½Õµ•¹Ð¹É•…Ñ•Q•áÑ9½‘” A½ÍÍ¥‰±”‘ÕÁ±¥…Ñ•Ìè€œ¤¤í‘…Ñ„¹‘ÕÁ±¥…Ñ•Ì¹™½É…  ¡±¤¤ôùí¥˜¡¤¥Ý…É¹¥¹œ¹…ÁÁ•¹¡‘½Õµ•¹Ð¹É•…Ñ•Q•áÑ9½‘” œ°€œ¤¤í½¹ÍÐ„õ‘½Õµ•¹Ð¹É•…Ñ•±•µ•¹Ð „œ¤í„¹¡É•˜ôœ½½¹Ñ…ÑÌ¼œ­¹¥í„¹Ñ…É•Ðô}‰±…¹¬œí„¹Ñ•áÑ½¹Ñ•¹Ðõ¹¹…µ”íÝ…É¹¥¹œ¹…ÁÁ•¹¡„¥ô¤íÝ…É¹¥¹œ¹¡¥‘‘•¸õ™…±Í”íÝ…É¹¥¹œ¹ÍÉ½±±%¹Ñ½Y¥•Ü¡í‰•¡…Ù¥½ÈèÍµ½½Ñ ô¥õô¥ô¤ ¤ìð½ÍÉ¥ÁÐøðýÁ¡Àô¤í•á¥Ðíô()¥˜¡ÁÉ•}µ…Ñ  œx½½¹Ñ…ÑÌ¼¡q¬¤Œœ°‘Á…Ñ °‘´¤¥ì‘¥ô¡¥¹Ð¤‘µlÅtì‘Œõ½¹Ñ…Ñ}É½Ü ‘¥¤ì‘…•ÍÌõ½¹Ñ…Ñ}…•ÍÌ ‘¥¤ì‘¹½Ñ•Ìõ‘ˆ ¤´ùÁÉ•Á…É” M1P¸¸¨±Ô¹ÕÍ•É¹…µ”I=4¹½Ñ•Ì¸1P)=%8ÕÍ•ÉÌÔ=8Ô¹¥õ¸¹ÕÍ•É}¥]!I½¹Ñ…Ñ}¥ôü=IH	dÉ•…Ñ•‘}…ÐMœ¤ì‘¹½Ñ•Ì´ù•á•ÕÑ”¡l‘¥‘t¤ì‘½ÁÁÌõ‘ˆ ¤´ùÁÉ•Á…É” M1P¼¸¨I=4½ÁÁ½ÉÑÕ¹¥Ñ¥•Ì¼)=%8½ÁÁ½ÉÑÕ¹¥Ñå}½¹Ñ…ÑÌ½Œ=8½Œ¹½ÁÁ½ÉÑÕ¹¥Ñå}¥õ¼¹¥]!I½Œ¹½¹Ñ…Ñ}¥ôü=IH	d¼¹É•…Ñ•‘}…ÐMœ¤ì‘½ÁÁÌ´ù•á•ÕÑ”¡l‘¥‘t¤ì‘É•µ¥¹‘•ÉÌõ‘ˆ ¤´ùÁÉ•Á…É” M1P€¨I=4É•µ¥¹‘•ÉÌ]!I½¹Ñ…Ñ}¥ôü9ÕÍ•É}¥ôü9½µÁ±•Ñ•‘}…Ð%L9U10=IH	d‘Õ•}…Ðœ¤ì‘É•µ¥¹‘•ÉÌ´ù•á•ÕÑ”¡l‘¥±ÕÍ•È ¥l¥ut¤ì(±…å½ÕÐ ‘l™¥ÉÍÑ}¹…µ”t¸œ€œ¸‘l±…ÍÑ}¹…µ”t±™Õ¹Ñ¥½¸ ¥ÕÍ” ‘Œ°‘¥°‘…•ÍÌ°‘¹½Ñ•Ì°‘½ÁÁÌ°‘É•µ¥¹‘•ÉÌ¥ìüøñ‘¥Ø±…ÍÌô‰…Ñ¥½¹Ìˆøñ ÄÍÑå±”ô‰µ…É¥¸èÀˆøðüõ” ‘l™¥ÉÍÑ}¹…µ”t¸œ€œ¸‘l±…ÍÑ}¹…µ”t¤üøð½ ÄøñÍÁ…¸±…ÍÌô‰ÍÁ…•Èˆøð½ÍÁ…¸øðýÁ¡À¥˜ ‘…•ÍÌôôôÝÉ¥Ñ”œ˜™…¸ ½¹Ñ…ÑÌ¹•‘¥Ðœ¤¤èüøñ„±…ÍÌô‰‰Ñ¸ˆ¡É•˜ôˆ½½¹Ñ…ÑÌ¼ðüô‘¥üø½•‘¥Ðˆù‘¥Ðð½„øðýÁ¡À•¹‘¥˜üøð½‘¥Øøñ‘¥Ø±…ÍÌô‰É¥ˆøñ‘¥Ø±…ÍÌô‰…Éˆøñ Èù½¹Ñ…Ðð½ ÈøñÀøðüõ” ‘l©½‰}Ñ¥Ñ±”t¤üøðüô ‘l©½‰}Ñ¥Ñ±”t˜˜‘l½µÁ…¹ät¤üœ…Ð€œèœœüøðüõ” ‘l½µÁ…¹ät¤üøð½ÀøñÀøñ„¡É•˜ô‰µ…¥±Ñ¼èðüõ” ‘l•µ…¥°t¤üøˆøðüõ” ‘l•µ…¥°t¤üøð½„øñ‰Èøðüõ” ‘lÁ¡½¹”t¤üøñ‰Èøðüõ¹°É‰È¡” ‘l…‘‘É•ÍÌt¤¤üøð½ÀøñÀ±…ÍÌô‰µÕÑ•ˆùÉ•…Ñ•€ðüõ” ‘lÉ•…Ñ•‘}…Ðt¤üøƒ
-Ü1…ÍÐÕÁ‘…Ñ•€ðüõ” ‘lÕÁ‘…Ñ•‘}…Ðt¤üøð½ÀøðýÁ¡À™½É•… ¡½¹Ñ…Ñ}Ñ…Ì ‘¥¤…Ì€‘Ð¥¥˜¡Ñ…}…•ÍÌ ¡¥¹Ð¤‘Ñl¥t¤„ôô¡¥‘‘•¸œ¤èüøñÍÁ…¸±…ÍÌô‰Ñ…œˆÍÑå±”ô‰‰…­É½Õ¹èðüõ” ‘Ñl½±½Èt¤üøˆøðüõ” ‘Ñl¹…µ”t¤üøð½ÍÁ…¸øðýÁ¡À•¹‘¥˜üøð½‘¥Øøñ‘¥Ø±…ÍÌô‰…Éˆøñ Èù=ÁÁ½ÉÑÕ¹¥Ñ¥•Ìð½ ÈøðýÁ¡À™½É•…  ‘½ÁÁÌ…Ì€‘¼¤èüøñÀøñÍÑÉ½¹œøðüõ” ‘½lÑ¥Ñ±”t¤üøð½ÍÑÉ½¹œøñ‰ÈøñÍÁ…¸±…ÍÌô‰Ñ…œˆÍÑå±”ô‰‰…­É½Õ¹èðüõ”¡½ÁÑ¥½¹}½±½È ½ÁÁ½ÉÑÕ¹¥Ñå}Í½É”œ°‘½lÍ½É”t¤¤üøˆøðüõ”¡½ÁÑ¥½¹}±…‰•° ½ÁÁ½ÉÑÕ¹¥Ñå}Í½É”œ°‘½lÍ½É”t¤¤üøð½ÍÁ…¸ø€ðüõ”¡½ÁÑ¥½¹}±…‰•° ½ÁÁ½ÉÑÕ¹¥Ñå}ÍÑ…ÑÕÌœ°‘½lÍÑ…ÑÕÌt¤¤üø€ðüõ¥ÍÍ•Ð ‘½lÙ…±Õ”t¤üœœ¹¹Õµ‰•É}™½Éµ…Ð ¡™±½…Ð¤‘½lÙ…±Õ”t°È¤èœœüøð½ÀøðýÁ¡À•¹‘™½É•… üøðýÁ¡À¥˜ ‘…•ÍÌôôôÝÉ¥Ñ”œ˜™…¸ ½¹Ñ…ÑÌ¹•‘¥Ðœ¤¤èüøñ™½É´µ•Ñ¡½ô‰Á½ÍÐˆ…Ñ¥½¸ôˆ½½¹Ñ…ÑÌ¼ðüô‘¥üø½½ÁÁ½ÉÑÕ¹¥Ñ¥•Ìˆøñ¥¹ÁÕÐÑåÁ”ô‰¡¥‘‘•¸ˆ¹…µ”ô‰}ÍÉ˜ˆÙ…±Õ”ôˆðüõÍÉ˜ ¤üøˆøñ±…‰•°ùQ¥Ñ±”ñ¥¹ÁÕÐ¹…µ”ô‰Ñ¥Ñ±”ˆÉ•ÅÕ¥É•øð½±…‰•°øñ‘¥Ø±…ÍÌô‰™½É´µÉ¥ˆøñ±…‰•°ùM½É”ñÍ•±•Ð¹…µ”ô‰Í½É”ˆøðýÁ¡À™½É•… ¡±¥ÍÑ}½ÁÑ¥½¹Ì ½ÁÁ½ÉÑÕ¹¥Ñå}Í½É”œ¤…Ì€‘½ÁÑ¥½¸¤èüøñ½ÁÑ¥½¸Ù…±Õ”ôˆðüõ” ‘½ÁÑ¥½¹l½‘”t¤üøˆøðüõ” ‘½ÁÑ¥½¹l±…‰•°t¤üøð½½ÁÑ¥½¸øðýÁ¡À•¹‘™½É•… üøð½Í•±•Ðøð½±…‰•°øñ±…‰•°ùY…±Õ”ñ¥¹ÁÕÐÑåÁ”ô‰¹Õµ‰•ÈˆÍÑ•ÀôˆÀ¸ÀÄˆ¹…µ”ô‰Ù…±Õ”ˆøð½±…‰•°øð½‘¥Øøñ‰ÕÑÑ½¸ù‘½ÁÁ½ÉÑÕ¹¥Ñäð½‰ÕÑÑ½¸øð½™½É´øðýÁ¡À•¹‘¥˜üøð½‘¥Øøð½‘¥ØøðýÁ¡ÀÉ•¹‘•É}½¹Ñ…Ñ}ÕÍÑ½µ}Ù…±Õ•Ì ‘¥¤ìüøñ‘¥Ø±…ÍÌô‰…Éˆøñ Èù9½Ñ•Ìð½ ÈøðýÁ¡À™½É•…  ‘¹½Ñ•Ì…Ì€‘¸¤èüøñ‘¥Ø±…ÍÌô‰¹½Ñ”ˆøðüõ¹°É‰È¡” ‘¹l‰½‘ät¤¤üøñ‘¥Ø±…ÍÌô‰µÕÑ•ˆøðüõ” ‘¹lÕÍ•É¹…µ”t¤üøƒ
-Ü€ðüõ” ‘¹lÉ•…Ñ•‘}…Ðt¤üøð½‘¥Øøð½‘¥ØøðýÁ¡À•¹‘™½É•… üøðýÁ¡À¥˜ ‘…•ÍÌôôôÝÉ¥Ñ”œ˜™…¸ ½¹Ñ…ÑÌ¹•‘¥Ðœ¤¤èüøñ™½É´µ•Ñ¡½ô‰Á½ÍÐˆ…Ñ¥½¸ôˆ½½¹Ñ…ÑÌ¼ðüô‘¥üø½¹½Ñ•Ìˆøñ¥¹ÁÕÐÑåÁ”ô‰¡¥‘‘•¸ˆ¹…µ”ô‰}ÍÉ˜ˆÙ…±Õ”ôˆðüõÍÉ˜ ¤üøˆøñ±…‰•°ù‘¹½Ñ”ñÑ•áÑ…É•„¹…µ”ô‰‰½‘äˆÉ•ÅÕ¥É•øð½Ñ•áÑ…É•„øð½±…‰•°øñ‰ÕÑÑ½¸ù‘¹½Ñ”ð½‰ÕÑÑ½¸øð½™½É´øðýÁ¡À•¹‘¥˜üøð½‘¥Øøñ‘¥Ø±…ÍÌô‰…Éˆøñ ÈùI•µ¥¹‘•ÉÌð½ ÈøðýÁ¡À™½É•…  ‘É•µ¥¹‘•ÉÌ…Ì€‘È¤èüøñ‘¥Ø±…ÍÌô‰¹½Ñ”ˆøñÍÑÉ½¹œøðüõ” ‘Élµ•ÍÍ…”t¤üøð½ÍÑÉ½¹œøñ‘¥Ø±…ÍÌô‰µÕÑ•ˆùÕ”€ðüõ” ‘Él‘Õ•}…Ðt¤üøð½‘¥Øøð½‘¥ØøðýÁ¡À•¹‘™½É•… üøñ™½É´µ•Ñ¡½ô‰Á½ÍÐˆ…Ñ¥½¸ôˆ½½¹Ñ…ÑÌ¼ðüô‘¥üø½É•µ¥¹‘•ÉÌˆøñ¥¹ÁÕÐÑåÁ”ô‰¡¥‘‘•¸ˆ¹…µ”ô‰}ÍÉ˜ˆÙ…±Õ”ôˆðüõÍÉ˜ ¤üøˆøñ‘¥Ø±…ÍÌô‰™½É´µÉ¥ˆøñ±…‰•°ùI•µ¥¹‘•Èµ•ÍÍ…”ñ¥¹ÁÕÐ¹…µ”ô‰µ•ÍÍ…”ˆÉ•ÅÕ¥É•øð½±…‰•°øñ±…‰•°ùQ…É•Ð‘…Ñ”…¹Ñ¥µ”ñ¥¹ÁÕÐÑåÁ”ô‰‘…Ñ•Ñ¥µ”µ±½…°ˆ¹…µ”ô‰‘Õ•}…ÐˆÉ•ÅÕ¥É•øð½±…‰•°øð½‘¥Øøñ‰ÕÑÑ½¸ùÉ•…Ñ”É•µ¥¹‘•Èð½‰ÕÑÑ½¸øð½™½É´øð½‘¥ØøðýÁ¡Àô¤í•á¥Ðíô()¥˜¡ÁÉ•}µ…Ñ  œx½½¹Ñ…ÑÌ¼¡q¬¤¼¡¹½Ñ•Íñ½ÁÁ½ÉÑÕ¹¥Ñ¥•Ì¤Œœ°‘Á…Ñ °‘´¤˜˜‘µ•Ñ¡½ôôôA=MPœ¥íÉ•ÅÕ¥É•}Á•Éµ¥ÍÍ¥½¸ ‘µlÉtôôô¹½Ñ•Ìœü½¹Ñ…ÑÌ¹Ù¥•Üœè½¹Ñ…ÑÌ¹•‘¥Ðœ¤íÙ•É¥™å}ÍÉ˜ ¤ì‘¥ô¡¥¹Ð¤‘µlÅtì‘É•½Éõ½¹Ñ…Ñ}É½Ü ‘¥¤í¥˜¡½¹Ñ…Ñ}…•ÍÌ ‘¥¤ôôô¡¥‘‘•¸œ¥í¡ÑÑÁ}É•ÍÁ½¹Í•}½‘” ÐÀÌ¤í•á¥Ð ½É‰¥‘‘•¸œ¤íõ¥˜ ‘µlÉtôôô¹½Ñ•Ìœ¥í‘ˆ ¤´ùÁÉ•Á…É” %9MIP%9Q<¹½Ñ•Ì¡½¹Ñ…Ñ}¥±ÕÍ•É}¥±‰½‘ä¤Y1UL ü°ü°ü¤œ¤´ù•á•ÕÑ”¡l‘¥±ÕÍ•È ¥l¥t±ÑÉ¥´¡Á½ÍÐ ‰½‘äœ¤¥t¤í…Õ‘¥Ð É•…Ñ”œ°¹½Ñ”œ±¹Õ±°±l½¹Ñ…Ñ}¥œôø‘¥‘t¤íõ•±Í•íÉ•ÅÕ¥É•}É•½É‘}•‘¥Ð ‘É•½É¤ì‘Í½É”ô¡ÍÑÉ¥¹œ¥Á½ÍÐ Í½É”œ¤í¥˜ …¥¹}…ÉÉ…ä ‘Í½É”±½ÁÑ¥½¹}½‘•Ì ½ÁÁ½ÉÑÕ¹¥Ñå}Í½É”œ¤±ÑÉÕ”¤¤‘Í½É”õ½ÁÑ¥½¹}½‘•Ì ½ÁÁ½ÉÑÕ¹¥Ñå}Í½É”œ¥lÁtüüµ•‘¥Õ´œí‘ˆ ¤´ùÁÉ•Á…É” %9MIP%9Q<½ÁÁ½ÉÑÕ¹¥Ñ¥•Ì¡½¹Ñ…Ñ}¥±½Ý¹•É}¥±É•…Ñ•‘}‰ä±Ñ¥Ñ±”±Í½É”±Ù…±Õ”¤Y1UL ü°ü°ü°ü°ü°ü¤œ¤´ù•á•ÕÑ”¡l‘¥±ÕÍ•È ¥l¥t±ÕÍ•È ¥l¥t±ÑÉ¥´¡Á½ÍÐ Ñ¥Ñ±”œ¤¤°‘Í½É”±Á½ÍÐ Ù…±Õ”œ¤üé¹Õ±±t¤ì‘½¥ô¡¥¹Ð¥‘ˆ ¤´ù±…ÍÑ%¹Í•ÉÑ% ¤í‘ˆ ¤´ùÁÉ•Á…É” %9MIP%9Q<½ÁÁ½ÉÑÕ¹¥Ñå}½¹Ñ…ÑÌ¡½ÁÁ½ÉÑÕ¹¥Ñå}¥±½¹Ñ…Ñ}¥¤Y1UL ü°ü¤œ¤´ù•á•ÕÑ”¡l‘½¥°‘¥‘t¤í…Õ‘¥Ð É•…Ñ”œ°½ÁÁ½ÉÑÕ¹¥Ñäœ°‘½¥±l½¹Ñ…Ñ}¥œôø‘¥‘t¤íõÉ•‘¥É•Ð œ½½¹Ñ…ÑÌ¼œ¸‘¥¤íô()¥˜¡ÁÉ•}µ…Ñ  œx½½¹Ñ…ÑÌ¼¡q¬¤½É•µ¥¹‘•ÉÌŒœ°‘Á…Ñ °‘´¤˜˜‘µ•Ñ¡½ôôôA=MPœ¥ì(€€€É•ÅÕ¥É•}Á•Éµ¥ÍÍ¥½¸ ½¹Ñ…ÑÌ¹Ù¥•Üœ¤íÙ•É¥™å}ÍÉ˜ ¤ì‘¥ô¡¥¹Ð¤‘µlÅtí½¹Ñ…Ñ}É½Ü ‘¥¤ì(€€€€‘µ•ÍÍ…”õÑÉ¥´ ¡ÍÑÉ¥¹œ¥Á½ÍÐ µ•ÍÍ…”œ¤¤ì‘‘Õ”õÍÑÉ}É•Á±…” Pœ°œ€œ°¡ÍÑÉ¥¹œ¥Á½ÍÐ ‘Õ•}…Ðœ¤¤ì(€€€¥˜ ‘µ•ÍÍ…”ôôôœñð…ÍÑÉÑ½Ñ¥µ” ‘‘Õ”¤¥í™±…Í  •ÉÉ½Èœ°I•µ¥¹‘•Èµ•ÍÍ…”…¹‘…Ñ”…É”É•ÅÕ¥É•¸œ¤íÉ•‘¥É•Ð œ½½¹Ñ…ÑÌ¼œ¸‘¥¤íô(€€€‘ˆ ¤´ùÁÉ•Á…É” %9MIP%9Q<É•µ¥¹‘•ÉÌ¡½¹Ñ…Ñ}¥±ÕÍ•É}¥±µ•ÍÍ…”±‘Õ•}…Ð¤Y1UL ü°ü°ü°ü¤œ¤´ù•á•ÕÑ”¡l‘¥±ÕÍ•È ¥l¥t°‘µ•ÍÍ…”°‘‘Õ•t¤ì(€€€…Õ‘¥Ð É•…Ñ”œ°É•µ¥¹‘•Èœ°¡¥¹Ð¥‘ˆ ¤´ù±…ÍÑ%¹Í•ÉÑ% ¤±l½¹Ñ…Ñ}¥œôø‘¥‘t¤í™±…Í  ÍÕ•ÍÌœ°I•µ¥¹‘•ÈÉ•…Ñ•¸œ¤íÉ•‘¥É•Ð œ½½¹Ñ…ÑÌ¼œ¸‘¥¤ì)ô()É•ÅÕ¥É”‘¥É¹…µ”¡}}%I}|¤€¸€œ½ÍÉŒ½É½ÕÑ•Í}•Ù•¹ÑÍ}±¥ÍÐ¹Á¡Àœì)É•ÅÕ¥É”‘¥É¹…µ”¡}}%I}|¤€¸€œ½ÍÉŒ½É½ÕÑ•Í}•áÑÉ„¹Á¡Àœì(
+ FOREIGN KEY(custom_field_id) REFERENCES custom_fields(id) ON DELETE CASCADE,
+ FOREIGN KEY(depends_on_field_id) REFERENCES custom_fields(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS custom_field_options (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, custom_field_id BIGINT UNSIGNED NOT NULL,
+ option_value VARCHAR(190) NOT NULL, position INT NOT NULL DEFAULT 0, active BOOLEAN NOT NULL DEFAULT TRUE,
+ UNIQUE(custom_field_id,option_value), FOREIGN KEY(custom_field_id) REFERENCES custom_fields(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS custom_field_tags (
+ custom_field_id BIGINT UNSIGNED NOT NULL, tag_id BIGINT UNSIGNED NOT NULL,
+ PRIMARY KEY(custom_field_id,tag_id), FOREIGN KEY(custom_field_id) REFERENCES custom_fields(id) ON DELETE CASCADE,
+ FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS contact_custom_values (
+ contact_id BIGINT UNSIGNED NOT NULL, custom_field_id BIGINT UNSIGNED NOT NULL, field_value TEXT NULL,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ PRIMARY KEY(contact_id,custom_field_id), FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE CASCADE,
+ FOREIGN KEY(custom_field_id) REFERENCES custom_fields(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS tag_groups (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(120) NOT NULL UNIQUE,
+ position INT NOT NULL DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS promotional_links (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL,
+ slug VARCHAR(80) NOT NULL UNIQUE, destination_url VARCHAR(2000) NOT NULL,
+ campaign_name VARCHAR(190) NULL, channel VARCHAR(120) NULL, variant VARCHAR(120) NULL,
+ active BOOLEAN NOT NULL DEFAULT TRUE, created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL,
+ FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL, INDEX(active,created_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS promotional_link_clicks (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, promotional_link_id BIGINT UNSIGNED NOT NULL,
+ clicked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, visitor_hash CHAR(64) NOT NULL,
+ referrer VARCHAR(2000) NULL, user_agent VARCHAR(1000) NULL, device_type VARCHAR(30) NOT NULL DEFAULT 'Other',
+ utm_source VARCHAR(190) NULL, utm_medium VARCHAR(190) NULL, utm_campaign VARCHAR(190) NULL,
+ query_json JSON NULL,
+ FOREIGN KEY(promotional_link_id) REFERENCES promotional_links(id) ON DELETE CASCADE,
+ INDEX(promotional_link_id,clicked_at), INDEX(promotional_link_id,visitor_hash)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS knowledge_base_items (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, title VARCHAR(190) NOT NULL,
+ item_type ENUM('text','file') NOT NULL DEFAULT 'text', body LONGTEXT NULL,
+ stored_name VARCHAR(255) NULL, original_name VARCHAR(255) NULL, mime_type VARCHAR(120) NULL,
+ extracted_text LONGTEXT NULL, created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL,
+ FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL, INDEX(item_type,updated_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS lead_magnets (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, user_id BIGINT UNSIGNED NOT NULL,
+ title VARCHAR(190) NOT NULL, magnet_type VARCHAR(80) NOT NULL, other_type VARCHAR(190) NULL,
+ target_audience TEXT NOT NULL, desired_outcome TEXT NULL, audience_problem TEXT NULL,
+ tone VARCHAR(120) NULL, call_to_action TEXT NULL, brand_requirements TEXT NULL, additional_instructions TEXT NULL,
+ content_html LONGTEXT NULL, status ENUM('draft','published','archived') NOT NULL DEFAULT 'draft',
+ public_slug VARCHAR(80) NULL UNIQUE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, published_at DATETIME NULL,
+ FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE, INDEX(status,updated_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS lead_magnet_messages (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, lead_magnet_id BIGINT UNSIGNED NOT NULL,
+ user_id BIGINT UNSIGNED NULL, role ENUM('user','assistant') NOT NULL, message LONGTEXT NOT NULL,
+ created_at TIMESTAMP DEFAULT CURREâ€¦2541 tokens truncatedâ€¦Y, thread_id BIGINT UNSIGNED NOT NULL, direction ENUM('inbound','outbound') NOT NULL,
+ from_address VARCHAR(320) NOT NULL, to_address VARCHAR(320) NOT NULL, subject VARCHAR(500) NOT NULL, body_text MEDIUMTEXT NOT NULL,
+ provider_message_id VARCHAR(500) NULL, delivery_status ENUM('queued','sent','delivered','bounced','complained','failed') NOT NULL DEFAULT 'queued',
+ error_message VARCHAR(1000) NULL, sent_by BIGINT UNSIGNED NULL, sent_at DATETIME NULL, received_at DATETIME NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(thread_id) REFERENCES email_threads(id) ON DELETE CASCADE,
+ FOREIGN KEY(sent_by) REFERENCES users(id) ON DELETE SET NULL, INDEX(thread_id,created_at), INDEX(provider_message_id), INDEX(delivery_status,created_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS contact_email_preferences (
+ contact_id BIGINT UNSIGNED PRIMARY KEY, status ENUM('subscribed','unsubscribed','transactional_only') NOT NULL DEFAULT 'subscribed',
+ consent_source VARCHAR(190) NULL, consent_at DATETIME NULL, unsubscribed_at DATETIME NULL, unsubscribe_token CHAR(64) NOT NULL UNIQUE,
+ updated_by BIGINT UNSIGNED NULL, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE CASCADE, FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS email_suppressions (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, email VARCHAR(320) NOT NULL UNIQUE,
+ reason ENUM('unsubscribe','bounce','complaint','manual') NOT NULL, source VARCHAR(190) NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ released_at DATETIME NULL, released_by BIGINT UNSIGNED NULL, FOREIGN KEY(released_by) REFERENCES users(id) ON DELETE SET NULL,
+ INDEX(reason,created_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS email_delivery_events (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, provider VARCHAR(60) NOT NULL, provider_message_id VARCHAR(500) NULL,
+ event_type VARCHAR(80) NOT NULL, recipient VARCHAR(320) NULL, payload_json JSON NULL, occurred_at DATETIME NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, INDEX(provider_message_id), INDEX(recipient,event_type,created_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS email_templates (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, subject VARCHAR(500) NOT NULL, body_text MEDIUMTEXT NOT NULL,
+ owner_user_id BIGINT UNSIGNED NULL, shared BOOLEAN NOT NULL DEFAULT FALSE, active BOOLEAN NOT NULL DEFAULT TRUE,
+ created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(owner_user_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL,
+ FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL, INDEX(owner_user_id,shared,active)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS user_email_signatures (
+ user_id BIGINT UNSIGNED PRIMARY KEY, signature_text TEXT NOT NULL, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS workflows (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL,
+ trigger_type ENUM('contact_created','tag_added','form_submitted','booking_created','opportunity_stage_changed','manual') NOT NULL,
+ trigger_config JSON NULL, steps_json JSON NOT NULL, active BOOLEAN NOT NULL DEFAULT FALSE,
+ created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL,
+ INDEX(active,trigger_type)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS workflow_events (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, event_key VARCHAR(190) NULL UNIQUE, event_type VARCHAR(80) NOT NULL, contact_id BIGINT UNSIGNED NULL,
+ entity_type VARCHAR(80) NULL, entity_id BIGINT UNSIGNED NULL, payload_json JSON NULL, processed_at DATETIME NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE SET NULL,
+ INDEX(processed_at,created_at), INDEX(event_type,created_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS workflow_enrollments (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, workflow_id BIGINT UNSIGNED NOT NULL, contact_id BIGINT UNSIGNED NOT NULL,
+ source_event_id BIGINT UNSIGNED NULL, status ENUM('active','completed','stopped','failed') NOT NULL DEFAULT 'active',
+ current_step INT UNSIGNED NOT NULL DEFAULT 0, next_run_at DATETIME NULL, error_message VARCHAR(1000) NULL,
+ started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, completed_at DATETIME NULL,
+ FOREIGN KEY(workflow_id) REFERENCES workflows(id) ON DELETE CASCADE, FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE CASCADE,
+ FOREIGN KEY(source_event_id) REFERENCES workflow_events(id) ON DELETE SET NULL, INDEX(status,next_run_at), INDEX(workflow_id,contact_id)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS workflow_logs (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, enrollment_id BIGINT UNSIGNED NOT NULL, step_index INT UNSIGNED NULL,
+ action_type VARCHAR(80) NOT NULL, status ENUM('success','failed','info') NOT NULL DEFAULT 'success', detail TEXT NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(enrollment_id) REFERENCES workflow_enrollments(id) ON DELETE CASCADE,
+ INDEX(enrollment_id,created_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS resource_portals (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, slug VARCHAR(120) NOT NULL UNIQUE,
+ headline VARCHAR(255) NOT NULL, description TEXT NULL, thank_you_message TEXT NULL, fixed_tag_ids JSON NULL,
+ active BOOLEAN NOT NULL DEFAULT FALSE, created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS resource_categories (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, description TEXT NULL, position INT NOT NULL DEFAULT 0,
+ active BOOLEAN NOT NULL DEFAULT TRUE, UNIQUE(name)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS resources (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, category_id BIGINT UNSIGNED NULL, title VARCHAR(255) NOT NULL, description TEXT NULL,
+ resource_type ENUM('file','url','lead_magnet') NOT NULL, stored_name VARCHAR(255) NULL, original_name VARCHAR(255) NULL,
+ mime_type VARCHAR(120) NULL, external_url VARCHAR(2000) NULL, lead_magnet_id BIGINT UNSIGNED NULL, tag_ids JSON NULL,
+ active BOOLEAN NOT NULL DEFAULT TRUE, created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(category_id) REFERENCES resource_categories(id) ON DELETE SET NULL, FOREIGN KEY(lead_magnet_id) REFERENCES lead_magnets(id) ON DELETE SET NULL,
+ FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL,
+ INDEX(category_id,active)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS resource_portal_items (
+ portal_id BIGINT UNSIGNED NOT NULL, resource_id BIGINT UNSIGNED NOT NULL, position INT NOT NULL DEFAULT 0,
+ PRIMARY KEY(portal_id,resource_id), FOREIGN KEY(portal_id) REFERENCES resource_portals(id) ON DELETE CASCADE,
+ FOREIGN KEY(resource_id) REFERENCES resources(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS resource_access_sessions (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, portal_id BIGINT UNSIGNED NOT NULL, contact_id BIGINT UNSIGNED NOT NULL,
+ access_token CHAR(64) NOT NULL UNIQUE, visitor_id BIGINT UNSIGNED NULL, expires_at DATETIME NOT NULL, last_seen_at DATETIME NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(portal_id) REFERENCES resource_portals(id) ON DELETE CASCADE,
+ FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE CASCADE, FOREIGN KEY(visitor_id) REFERENCES site_visitors(id) ON DELETE SET NULL,
+ INDEX(portal_id,contact_id), INDEX(expires_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS resource_engagements (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, portal_id BIGINT UNSIGNED NOT NULL, resource_id BIGINT UNSIGNED NOT NULL,
+ contact_id BIGINT UNSIGNED NOT NULL, access_session_id BIGINT UNSIGNED NULL, engagement_type ENUM('view','download','open') NOT NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(portal_id) REFERENCES resource_portals(id) ON DELETE CASCADE,
+ FOREIGN KEY(resource_id) REFERENCES resources(id) ON DELETE CASCADE, FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE CASCADE,
+ FOREIGN KEY(access_session_id) REFERENCES resource_access_sessions(id) ON DELETE SET NULL, INDEX(resource_id,created_at), INDEX(contact_id,created_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS products (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, sku VARCHAR(100) NULL UNIQUE, description TEXT NULL,
+ unit_price DECIMAL(12,2) NOT NULL DEFAULT 0, currency CHAR(3) NOT NULL DEFAULT 'USD', taxable BOOLEAN NOT NULL DEFAULT FALSE,
+ active BOOLEAN NOT NULL DEFAULT TRUE, created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS quotes (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, quote_number VARCHAR(60) NOT NULL UNIQUE, contact_id BIGINT UNSIGNED NOT NULL,
+ opportunity_id BIGINT UNSIGNED NULL, owner_user_id BIGINT UNSIGNED NULL, title VARCHAR(255) NOT NULL,
+ introduction TEXT NULL, terms TEXT NULL, currency CHAR(3) NOT NULL DEFAULT 'USD', subtotal DECIMAL(12,2) NOT NULL DEFAULT 0,
+ discount_amount DECIMAL(12,2) NOT NULL DEFAULT 0, tax_amount DECIMAL(12,2) NOT NULL DEFAULT 0, total_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+ status ENUM('draft','sent','viewed','accepted','declined','expired','paid','void') NOT NULL DEFAULT 'draft', valid_until DATE NULL,
+ public_token CHAR(64) NOT NULL UNIQUE, sent_at DATETIME NULL, viewed_at DATETIME NULL, accepted_at DATETIME NULL, paid_at DATETIME NULL,
+ created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE RESTRICT, FOREIGN KEY(opportunity_id) REFERENCES opportunities(id) ON DELETE SET NULL,
+ FOREIGN KEY(owner_user_id) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL,
+ FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL, INDEX(status,valid_until), INDEX(contact_id,created_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS quote_items (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, quote_id BIGINT UNSIGNED NOT NULL, product_id BIGINT UNSIGNED NULL,
+ description VARCHAR(1000) NOT NULL, quantity DECIMAL(12,2) NOT NULL DEFAULT 1, unit_price DECIMAL(12,2) NOT NULL DEFAULT 0,
+ discount_percent DECIMAL(5,2) NOT NULL DEFAULT 0, tax_percent DECIMAL(5,2) NOT NULL DEFAULT 0, line_total DECIMAL(12,2) NOT NULL DEFAULT 0,
+ position INT NOT NULL DEFAULT 0, FOREIGN KEY(quote_id) REFERENCES quotes(id) ON DELETE CASCADE,
+ FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE SET NULL, INDEX(quote_id,position)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS quote_acceptances (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, quote_id BIGINT UNSIGNED NOT NULL, signer_name VARCHAR(190) NOT NULL,
+ signer_email VARCHAR(320) NOT NULL, accepted_terms BOOLEAN NOT NULL, signature_text VARCHAR(500) NULL, ip_hash CHAR(64) NULL,
+ user_agent VARCHAR(500) NULL, accepted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(quote_id) REFERENCES quotes(id) ON DELETE CASCADE, INDEX(quote_id,accepted_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS quote_payments (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, quote_id BIGINT UNSIGNED NOT NULL, provider VARCHAR(40) NOT NULL DEFAULT 'stripe',
+ checkout_session_id VARCHAR(255) NULL UNIQUE, payment_intent_id VARCHAR(255) NULL, amount DECIMAL(12,2) NOT NULL,
+ currency CHAR(3) NOT NULL, status ENUM('pending','paid','failed','refunded','cancelled') NOT NULL DEFAULT 'pending',
+ provider_url VARCHAR(2000) NULL, paid_at DATETIME NULL, payload_json JSON NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(quote_id) REFERENCES quotes(id) ON DELETE CASCADE, INDEX(status,created_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_calendars (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, owner_user_id BIGINT UNSIGNED NULL,
+ external_provider_id BIGINT UNSIGNED NULL,
+ calendar_type ENUM('individual','round_robin','collective') NOT NULL DEFAULT 'individual', timezone VARCHAR(80) NOT NULL DEFAULT 'America/New_York',
+ active BOOLEAN NOT NULL DEFAULT TRUE, created_by BIGINT UNSIGNED NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(owner_user_id) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_calendar_members (
+ calendar_id BIGINT UNSIGNED NOT NULL, user_id BIGINT UNSIGNED NOT NULL, weight SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+ PRIMARY KEY(calendar_id,user_id), FOREIGN KEY(calendar_id) REFERENCES booking_calendars(id) ON DELETE CASCADE,
+ FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_availability_exceptions (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, calendar_id BIGINT UNSIGNED NOT NULL, user_id BIGINT UNSIGNED NOT NULL,
+ starts_at DATETIME NOT NULL, ends_at DATETIME NOT NULL, reason VARCHAR(255) NULL, created_by BIGINT UNSIGNED NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(calendar_id) REFERENCES booking_calendars(id) ON DELETE CASCADE,
+ FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL,
+ INDEX(calendar_id,user_id,starts_at,ends_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_availability_rules (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, calendar_id BIGINT UNSIGNED NOT NULL, user_id BIGINT UNSIGNED NULL,
+ weekday TINYINT UNSIGNED NOT NULL, start_time TIME NOT NULL, end_time TIME NOT NULL,
+ FOREIGN KEY(calendar_id) REFERENCES booking_calendars(id) ON DELETE CASCADE, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+ INDEX(calendar_id,weekday)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_meeting_types (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, calendar_id BIGINT UNSIGNED NOT NULL, name VARCHAR(190) NOT NULL,
+ external_service_id BIGINT UNSIGNED NULL,
+ slug VARCHAR(100) NOT NULL UNIQUE, description TEXT NULL, duration_minutes SMALLINT UNSIGNED NOT NULL DEFAULT 30,
+ buffer_before SMALLINT UNSIGNED NOT NULL DEFAULT 0, buffer_after SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+ minimum_notice_hours SMALLINT UNSIGNED NOT NULL DEFAULT 4, location_type ENUM('video','phone','in_person','custom') NOT NULL DEFAULT 'video',
+ location_details VARCHAR(500) NULL, tag_ids JSON NULL, active BOOLEAN NOT NULL DEFAULT TRUE,
+ created_by BIGINT UNSIGNED NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(calendar_id) REFERENCES booking_calendars(id) ON DELETE CASCADE, FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS bookings (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, meeting_type_id BIGINT UNSIGNED NOT NULL, calendar_id BIGINT UNSIGNED NOT NULL,
+ assigned_user_id BIGINT UNSIGNED NULL, contact_id BIGINT UNSIGNED NULL, session_id BIGINT UNSIGNED NULL,
+ attendee_name VARCHAR(190) NOT NULL, attendee_email VARCHAR(190) NOT NULL, attendee_phone VARCHAR(80) NULL,
+ starts_at DATETIME NOT NULL, ends_at DATETIME NOT NULL, timezone VARCHAR(80) NOT NULL, answers_json JSON NULL,
+ status ENUM('confirmed','cancelled','completed','no_show') NOT NULL DEFAULT 'confirmed', cancel_token CHAR(64) NOT NULL UNIQUE,
+ external_appointment_id BIGINT UNSIGNED NULL, meeting_url VARCHAR(2000) NULL, calendar_sync_status ENUM('pending','synced','partial','failed') NOT NULL DEFAULT 'pending', calendar_sync_error VARCHAR(1000) NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(meeting_type_id) REFERENCES booking_meeting_types(id), FOREIGN KEY(calendar_id) REFERENCES booking_calendars(id),
+ FOREIGN KEY(assigned_user_id) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE SET NULL,
+ FOREIGN KEY(session_id) REFERENCES site_sessions(id) ON DELETE SET NULL, INDEX(assigned_user_id,starts_at), INDEX(calendar_id,starts_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_questions (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, meeting_type_id BIGINT UNSIGNED NOT NULL, label VARCHAR(190) NOT NULL,
+ field_key VARCHAR(80) NOT NULL, field_type ENUM('text','textarea','select','checkbox') NOT NULL DEFAULT 'text',
+ options_json JSON NULL, required BOOLEAN NOT NULL DEFAULT FALSE, position INT NOT NULL DEFAULT 0,
+ UNIQUE(meeting_type_id,field_key), FOREIGN KEY(meeting_type_id) REFERENCES booking_meeting_types(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_notification_log (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, booking_id BIGINT UNSIGNED NOT NULL, notification_type VARCHAR(40) NOT NULL,
+ recipient VARCHAR(190) NOT NULL, scheduled_for DATETIME NULL, sent_at DATETIME NULL, status ENUM('pending','sent','failed') NOT NULL DEFAULT 'pending',
+ error_message VARCHAR(500) NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(booking_id) REFERENCES bookings(id) ON DELETE CASCADE, INDEX(status,scheduled_for), UNIQUE(booking_id,notification_type,recipient)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS calendar_connections (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, user_id BIGINT UNSIGNED NOT NULL, provider ENUM('google','microsoft','caldav') NOT NULL,
+ account_email VARCHAR(190) NULL, access_token_enc LONGTEXT NULL, refresh_token_enc LONGTEXT NULL, expires_at DATETIME NULL,
+ external_calendar_id VARCHAR(500) NULL, active BOOLEAN NOT NULL DEFAULT TRUE, sync_status ENUM('pending','healthy','error') NOT NULL DEFAULT 'pending',
+ last_error VARCHAR(500) NULL, last_sync_at DATETIME NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id,provider,account_email), FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_calendar_events (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, booking_id BIGINT UNSIGNED NOT NULL, connection_id BIGINT UNSIGNED NOT NULL,
+ external_event_id VARCHAR(1000) NOT NULL, external_url VARCHAR(2000) NULL, etag VARCHAR(500) NULL,
+ sync_status ENUM('synced','failed','deleted') NOT NULL DEFAULT 'synced', last_error VARCHAR(1000) NULL,
+ last_synced_at DATETIME NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ UNIQUE(booking_id,connection_id), FOREIGN KEY(booking_id) REFERENCES bookings(id) ON DELETE CASCADE,
+ FOREIGN KEY(connection_id) REFERENCES calendar_connections(id) ON DELETE CASCADE, INDEX(sync_status,last_synced_at)
+) ENGINE=InnoDB;
+

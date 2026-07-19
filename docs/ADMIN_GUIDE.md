@@ -32,6 +32,14 @@ OpenCRM creates a daily checksummed database/upload backup, verifies the latest 
 
 Non-transactional email honors contact consent and the suppression list. Configure SES delivery/bounce/complaint notifications to the signed SNS webhook shown on Email compliance. Stripe Checkout uses encrypted credentials and a signed webhook configured under Payment settings.
 
+## Operational notifications
+
+Admin → Operational notifications configures the administrator recipient, warning/error threshold, repeat cooldown, and repeated-webhook threshold. Backup failure, failed backup verification, stale backups, low disk, calendar/write-back failures, workflow failures, and repeated rejected SES/Stripe webhooks create deduplicated incidents. OpenCRM sends once when an incident begins, repeats only after the cooldown, and sends a recovery message.
+
+## Legal and privacy content
+
+Admin → Legal & privacy controls the public Privacy Policy, Terms of Use, analytics/cookie notice, marketing consent language, retention statement, company identity/address, and public-form disclosure. Stable pages are published at `/legal/privacy` and `/legal/terms`; public CRM experiences link them automatically. The supplied text is a starting template and must be reviewed by qualified counsel for the organization’s actual practices and applicable jurisdictions.
+
 ## Sites and custom domains
 
 Add a domain from a site's Domains page, publish the displayed `_opencrm` TXT record, point the hostname to the Lightsail instance, and check DNS. A root-only scheduled job provisions Apache and Let's Encrypt after ownership verification. Configure 301/302 path redirects when published URLs change.

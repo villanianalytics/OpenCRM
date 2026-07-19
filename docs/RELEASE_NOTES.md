@@ -12,4 +12,6 @@
 - Added first-touch, last-touch, and linear multi-touch marketing attribution.
 - Added scheduled checksummed backups, integrity verification, health checks, and expanded regression tests.
 - Expanded contextual help, operations guidance, and copy-ready API examples.
+- Added deduplicated administrator incident emails with recovery notices and configurable thresholds.
+- Added admin-managed Privacy Policy, Terms, cookie notice, marketing consent, retention, company identity, and public legal links.
 

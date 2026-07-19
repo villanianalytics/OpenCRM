@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require dirname(__DIR__).'/src/bootstrap.php';
+set_exception_handler(function(Throwable $e):never{operational_notify('backup','error','Automated backup failed: '.$e->getMessage());fwrite(STDERR,$e->getMessage().PHP_EOL);exit(1);});
 
 $root=dirname(__DIR__);$dir=$root.'/storage/backups';if(!is_dir($dir)&&!mkdir($dir,0770,true))throw new RuntimeException('Could not create backup directory.');
 $stamp=(new DateTimeImmutable())->format('Ymd_His');$prefix=$dir.'/opencrm_'.$stamp;
@@ -14,6 +15,6 @@ try{
     $manifest=['created_at'=>(new DateTimeImmutable())->format(DateTimeInterface::ATOM),'database'=>basename($sql.'.gz'),'database_sha256'=>hash_file('sha256',$sql.'.gz'),'uploads'=>basename($archive),'uploads_sha256'=>hash_file('sha256',$archive)];
     file_put_contents($prefix.'_manifest.json',json_encode($manifest,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
     foreach(glob($dir.'/opencrm_*')?:[] as $file)if(filemtime($file)<time()-30*86400)unlink($file);
-    app_log('info','Automated backup completed',['manifest'=>basename($prefix.'_manifest.json')]);echo $prefix.'_manifest.json'.PHP_EOL;
+    app_log('info','Automated backup completed',['manifest'=>basename($prefix.'_manifest.json')]);operational_notify('backup','healthy','Automated backup completed successfully.',['manifest'=>basename($prefix.'_manifest.json')]);echo $prefix.'_manifest.json'.PHP_EOL;
 }finally{@unlink($defaults);}
 

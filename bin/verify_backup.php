@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require dirname(__DIR__).'/src/bootstrap.php';
+set_exception_handler(function(Throwable $e):never{operational_notify('backup_verification','error','Backup verification failed: '.$e->getMessage());fwrite(STDERR,$e->getMessage().PHP_EOL);exit(1);});
 
 $dir=dirname(__DIR__).'/storage/backups';$manifestPath=$argv[1]??'';
 if($manifestPath===''){$files=glob($dir.'/opencrm_*_manifest.json')?:[];usort($files,fn($a,$b)=>filemtime($b)<=>filemtime($a));$manifestPath=$files[0]??'';}
@@ -11,5 +12,5 @@ $gz=gzopen($dbFile,'rb');$sample='';while(!gzeof($gz)&&strlen($sample)<2_000_000
 foreach(['CREATE TABLE `contacts`','CREATE TABLE `users`','CREATE TABLE `opportunities`'] as $marker)if(!str_contains($sample,$marker))throw new RuntimeException('Database dump is missing '.$marker);
 exec('tar -tzf '.escapeshellarg($uploadsFile).' 2>&1',$listing,$code);if($code!==0||!in_array('uploads/',$listing,true))throw new RuntimeException('Upload archive verification failed.');
 file_put_contents($base.'/last_verified.json',json_encode(['manifest'=>basename($manifestPath),'verified_at'=>(new DateTimeImmutable())->format(DateTimeInterface::ATOM)],JSON_PRETTY_PRINT));
-app_log('info','Backup verification passed',['manifest'=>basename($manifestPath)]);echo 'Backup verified: '.basename($manifestPath).PHP_EOL;
+app_log('info','Backup verification passed',['manifest'=>basename($manifestPath)]);operational_notify('backup_verification','healthy','Backup integrity verification passed.',['manifest'=>basename($manifestPath)]);echo 'Backup verified: '.basename($manifestPath).PHP_EOL;
 

@@ -93,5 +93,6 @@ if($adminUsername!==''&&$adminPassword!==''){
 }elseif(!(int)db()->query('SELECT COUNT(*) FROM users WHERE is_admin=1')->fetchColumn()){
     fwrite(STDERR,"No administrator created. Set ADMIN_USERNAME and ADMIN_PASSWORD, then run this migration again.\n");
 }
+$settingSave=db()->prepare('INSERT INTO app_settings(setting_key,setting_value) VALUES(?,?) ON DUPLICATE KEY UPDATE setting_value=IF(setting_value=\'\',VALUES(setting_value),setting_value)');$adminContact=db()->query("SELECT email FROM users WHERE is_admin=1 AND email IS NOT NULL AND email<>'' ORDER BY id LIMIT 1")->fetchColumn();$fallbackEmail=$adminContact?:app_setting('mail_from_address');if($fallbackEmail){$settingSave->execute(['operational_alert_email',$fallbackEmail]);$settingSave->execute(['legal_contact_email',$fallbackEmail]);}$settingSave->execute(['legal_company_name',app_setting('app_name','OpenCRM')]);
 echo "Migration complete.\n";
 
