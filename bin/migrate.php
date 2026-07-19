@@ -75,7 +75,7 @@ if(!in_array('social_description',$pageColumns,true))db()->exec('ALTER TABLE sit
 if(!in_array('social_image_url',$pageColumns,true))db()->exec('ALTER TABLE site_pages ADD social_image_url VARCHAR(2000) NULL AFTER social_description');
 if(!in_array('noindex',$pageColumns,true))db()->exec('ALTER TABLE site_pages ADD noindex BOOLEAN NOT NULL DEFAULT FALSE AFTER social_image_url');
 
-$permissions = json_encode(['contacts.view','contacts.edit','events.view','events.edit','reports.view','reports.edit','lead_magnets.view','lead_magnets.edit','forms.view','forms.edit','promotional_links.view','promotional_links.edit','sites.view','sites.edit','bookings.view','bookings.edit']);
+$permissions = json_encode(['contacts.view','contacts.edit','events.view','events.edit','reports.view','reports.edit','lead_magnets.view','lead_magnets.edit','forms.view','forms.edit','promotional_links.view','promotional_links.edit','sites.view','sites.edit','bookings.view','bookings.edit','communications.view','communications.edit']);
 $stmt = db()->prepare('INSERT INTO roles (name, permissions_json) VALUES (?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name)');
 $stmt->execute(['Staff', $permissions]);
 $roleId = (int) db()->lastInsertId();
