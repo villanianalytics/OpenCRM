@@ -1,5 +1,14 @@
 # OpenCRM Release Notes
 
+## 1.0 Â· 2026-07-19
+
+- Declared the first stable OpenCRM release.
+- Consolidated navigation into Contacts, Sales, Marketing, Engage, Reports, Help, and Admin.
+- Added encrypted multi-mailbox SMTP pools with weighted distribution, sender health, rate limits, queued delivery, retries, and usage reporting.
+- Preserved consent, unsubscribe, suppression, bounce, and complaint controls across pooled campaign delivery.
+- Added automatic XML sitemaps and robots directives for published sites.
+- Added site and page SEO management with search previews, metadata validation, canonical URLs, social cards, indexing controls, Search Console verification, image/H1 checks, and Schema.org JSON-LD configuration.
+
 ## 2026-07-19
 
 - Restored the dashboard opportunity pipeline chart.

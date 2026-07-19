@@ -1,5 +1,7 @@
 # OpenCRM
 
+Current stable release: **1.0**
+
 A lightweight, dependency-free CRM for PHP 8.2+ and MySQL 8.0+.
 
 ## Disclaimer

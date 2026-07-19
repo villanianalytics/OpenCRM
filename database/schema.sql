@@ -266,29 +266,30 @@ CREATE TABLE IF NOT EXISTS lead_magnets (
 CREATE TABLE IF NOT EXISTS lead_magnet_messages (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, lead_magnet_id BIGINT UNSIGNED NOT NULL,
  user_id BIGINT UNSIGNED NULL, role ENUM('user','assistant') NOT NULL, message LONGTEXT NOT NULL,
- created_at TIMESTAMP DEFAULT CURRE…2541 tokens truncated…Y, thread_id BIGINT UNSIGNED NOT NULL, direction ENUM('inbound','outbound') NOT NULL,
- from_address VARCHAR(320) NOT NULL, to_address VARCHAR(320) NOT NULL, subject VARCHAR(500) NOT NULL, body_text MEDIUMTEXT NOT NULL,
- provider_message_id VARCHAR(500) NULL, delivery_status ENUM('queued','sent','delivered','bounced','complained','failed') NOT NULL DEFAULT 'queued',
- error_message VARCHAR(1000) NULL, sent_by BIGINT UNSIGNED NULL, sent_at DATETIME NULL, received_at DATETIME NULL,
- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(thread_id) REFERENCES email_threads(id) ON DELETE CASCADE,
- FOREIGN KEY(sent_by) REFERENCES users(id) ON DELETE SET NULL, INDEX(thread_id,created_at), INDEX(provider_message_id), INDEX(delivery_status,created_at)
+ created_at TIMESTAMP DEFAULT CURRE…3153 tokens truncated…me VARCHAR(190) NULL,
+ from_address VARCHAR(320) NOT NULL, reply_to VARCHAR(320) NULL, smtp_host VARCHAR(255) NOT NULL,
+ smtp_port SMALLINT UNSIGNED NOT NULL DEFAULT 587, smtp_encryption ENUM('none','tls','ssl') NOT NULL DEFAULT 'tls',
+ smtp_username VARCHAR(320) NULL, smtp_password_enc TEXT NULL, hourly_limit INT UNSIGNED NOT NULL DEFAULT 100,
+ daily_limit INT UNSIGNED NOT NULL DEFAULT 500, weight SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+ active BOOLEAN NOT NULL DEFAULT TRUE, health_status ENUM('healthy','warning','disabled') NOT NULL DEFAULT 'healthy',
+ last_error VARCHAR(1000) NULL, last_used_at DATETIME NULL, created_by BIGINT UNSIGNED NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ UNIQUE(from_address), FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL, INDEX(active,health_status,last_used_at)
 ) ENGINE=InnoDB;
-CREATE TABLE IF NOT EXISTS contact_email_preferences (
- contact_id BIGINT UNSIGNED PRIMARY KEY, status ENUM('subscribed','unsubscribed','transactional_only') NOT NULL DEFAULT 'subscribed',
- consent_source VARCHAR(190) NULL, consent_at DATETIME NULL, unsubscribed_at DATETIME NULL, unsubscribe_token CHAR(64) NOT NULL UNIQUE,
- updated_by BIGINT UNSIGNED NULL, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
- FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE CASCADE, FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL
+CREATE TABLE IF NOT EXISTS email_mailbox_sends (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, mailbox_id BIGINT UNSIGNED NOT NULL, recipient VARCHAR(320) NOT NULL,
+ message_type ENUM('transactional','marketing') NOT NULL, status ENUM('sent','failed') NOT NULL,
+ error_message VARCHAR(1000) NULL, sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(mailbox_id) REFERENCES email_mailboxes(id) ON DELETE CASCADE, INDEX(mailbox_id,sent_at), INDEX(status,sent_at)
 ) ENGINE=InnoDB;
-CREATE TABLE IF NOT EXISTS email_suppressions (
- id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, email VARCHAR(320) NOT NULL UNIQUE,
- reason ENUM('unsubscribe','bounce','complaint','manual') NOT NULL, source VARCHAR(190) NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
- released_at DATETIME NULL, released_by BIGINT UNSIGNED NULL, FOREIGN KEY(released_by) REFERENCES users(id) ON DELETE SET NULL,
- INDEX(reason,created_at)
-) ENGINE=InnoDB;
-CREATE TABLE IF NOT EXISTS email_delivery_events (
- id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, provider VARCHAR(60) NOT NULL, provider_message_id VARCHAR(500) NULL,
- event_type VARCHAR(80) NOT NULL, recipient VARCHAR(320) NULL, payload_json JSON NULL, occurred_at DATETIME NULL,
- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, INDEX(provider_message_id), INDEX(recipient,event_type,created_at)
+CREATE TABLE IF NOT EXISTS email_queue (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, mailbox_id BIGINT UNSIGNED NULL, recipient VARCHAR(320) NOT NULL,
+ subject VARCHAR(500) NOT NULL, body_text MEDIUMTEXT NOT NULL, transactional BOOLEAN NOT NULL DEFAULT FALSE,
+ status ENUM('queued','processing','sent','failed','cancelled') NOT NULL DEFAULT 'queued', attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
+ available_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, last_error VARCHAR(1000) NULL, created_by BIGINT UNSIGNED NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, sent_at DATETIME NULL,
+ FOREIGN KEY(mailbox_id) REFERENCES email_mailboxes(id) ON DELETE SET NULL, FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL,
+ INDEX(status,available_at), INDEX(mailbox_id,created_at)
 ) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS email_templates (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, subject VARCHAR(500) NOT NULL, body_text MEDIUMTEXT NOT NULL,

@@ -21,11 +21,13 @@ Only a record's creator, owner, or system administrator can change it. Users wit
 - Forms create or update CRM contacts and apply fixed or conditional tags.
 - Lead magnets use the administrator knowledge base and application branding, then export to PDF/DOCX or a public link.
 - Sites embed CRM forms and booking pages and attribute resulting conversions.
+- Site and page SEO tools manage search previews, metadata, social cards, structured data, sitemaps, robots directives, redirects, and indexing checks.
 - Marketing attribution compares first-touch, last-touch, and linear multi-touch credit across conversions and paid revenue.
 
 ## Conversations, workflows, and resources
 
 - Conversations keep contact email threads, ownership, unread status, templates, signatures, and opportunity context together.
+- Administrators can configure multiple authenticated sending mailboxes with health monitoring and hourly/daily delivery limits.
 - Workflows react to contact, tag, form, booking, and pipeline events, then run email, tag, owner, alert, and wait steps.
 - Resources publishes a gated library of files, links, and lead magnets while tracking contact engagement.
 
