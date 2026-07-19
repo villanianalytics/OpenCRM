@@ -21,7 +21,19 @@ Only a record's creator, owner, or system administrator can change it. Users wit
 - Forms create or update CRM contacts and apply fixed or conditional tags.
 - Lead magnets use the administrator knowledge base and application branding, then export to PDF/DOCX or a public link.
 - Sites embed CRM forms and booking pages and attribute resulting conversions.
+- Marketing attribution compares first-touch, last-touch, and linear multi-touch credit across conversions and paid revenue.
+
+## Conversations, workflows, and resources
+
+- Conversations keep contact email threads, ownership, unread status, templates, signatures, and opportunity context together.
+- Workflows react to contact, tag, form, booking, and pipeline events, then run email, tag, owner, alert, and wait steps.
+- Resources publishes a gated library of files, links, and lead magnets while tracking contact engagement.
+
+## Quotes and payments
+
+Maintain products under Quotes, create a branded proposal, and email its public review link. Recipients can accept with a typed signature. When Stripe Checkout is enabled, successful payment updates the quote and marks a linked opportunity won.
 
 ## Help
 
 Select **Help** in OpenCRM or visit `/help` for searchable, task-specific instructions.
+

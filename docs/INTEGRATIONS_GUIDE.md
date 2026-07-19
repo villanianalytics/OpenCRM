@@ -21,3 +21,6 @@ Mail settings support local transport or authenticated SMTP such as Amazon SES. 
 ## Diagnostics
 
 Use Application logs, Audit report, Calendar connection health, Booking engine test, Mail test, and System health. Record the timestamp and endpoint when investigating webhooks. Redact authorization headers and secrets before sharing diagnostics.
+
+Copy-ready contact API and webhook request bodies are available in `docs/API_EXAMPLES.md`.
+

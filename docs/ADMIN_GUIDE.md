@@ -20,6 +20,13 @@ Maintain tags and tag groups, custom fields and groupings, conditional field rul
 
 Audit reports show logins and record actions. Application logs capture configured request/payload detail and can be purged by age. System health covers database, storage, runtime, and scheduled integration jobs. Lightsail snapshots protect the server, but database/export recovery procedures should still be tested periodically.
 
+OpenCRM creates a daily checksummed database/upload backup, verifies the latest backup daily, retains 30 days, and performs an hourly health check. Results are written to application logs and `storage/logs/cron.log`. See `docs/OPERATIONS.md` for commands and recovery steps.
+
+## Email compliance and payments
+
+Non-transactional email honors contact consent and the suppression list. Configure SES delivery/bounce/complaint notifications to the signed SNS webhook shown on Email compliance. Stripe Checkout uses encrypted credentials and a signed webhook configured under Payment settings.
+
 ## Sites and custom domains
 
 Add a domain from a site's Domains page, publish the displayed `_opencrm` TXT record, point the hostname to the Lightsail instance, and check DNS. A root-only scheduled job provisions Apache and Let's Encrypt after ownership verification. Configure 301/302 path redirects when published URLs change.
+
