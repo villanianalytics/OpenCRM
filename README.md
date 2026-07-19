@@ -13,6 +13,7 @@ This software is provided **"AS IS"**, without warranty of any kind, express or 
 - Opportunity scoring (high, medium, low, keep in touch, not a buyer)
 - Contact notes
 - Events, slide uploads, and linked attendees
+- Dynamic promotional links and downloadable QR codes with click, visitor, referrer, device, and UTM analytics
 - Saved reports with filters and graphical charts
 - CSRF protection, secure sessions, password hashing, upload validation, and audit logs
 
