@@ -39,6 +39,10 @@ Use Admin â†’ Sending mailboxes to add authenticated SMTP senders for legit
 
 Run `php bin/process_email_queue.php` every minute from cron to process queued campaign mail. Failed messages retry with exponential backoff up to five attempts. Mailbox usage and health are visible from the administration screen. Configure SPF, DKIM, and DMARC for every sending domain and remain within each provider's acceptable-use policy.
 
+### Scheduled reports
+
+Admin â†’ Scheduled reports can email a pipeline summary on a selected weekday and a new-contacts-across-all-users summary on the last calendar day of each month. Each schedule supports multiple recipients, a delivery time in the application timezone, status/error history, and enable/disable controls. Run `php bin/send_scheduled_reports.php` every five minutes from cron.
+
 ## Operational notifications
 
 Admin â†’ Operational notifications configures the administrator recipient, warning/error threshold, repeat cooldown, and repeated-webhook threshold. Backup failure, failed backup verification, stale backups, low disk, calendar/write-back failures, workflow failures, and repeated rejected SES/Stripe webhooks create deduplicated incidents. OpenCRM sends once when an incident begins, repeats only after the cooldown, and sends a recovery message.

@@ -107,6 +107,17 @@ CREATE TABLE IF NOT EXISTS saved_reports (
  filters_json JSON NOT NULL, shared BOOLEAN NOT NULL DEFAULT FALSE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS scheduled_reports (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL,
+ report_type ENUM('weekly_pipeline','monthly_new_contacts') NOT NULL,
+ recipient_emails TEXT NOT NULL, weekday TINYINT UNSIGNED NULL, send_time TIME NOT NULL DEFAULT '08:00:00',
+ timezone VARCHAR(80) NOT NULL DEFAULT 'America/New_York', next_run_at DATETIME NOT NULL,
+ last_run_at DATETIME NULL, last_status ENUM('pending','sent','failed') NOT NULL DEFAULT 'pending',
+ last_error VARCHAR(1000) NULL, active BOOLEAN NOT NULL DEFAULT TRUE,
+ created_by BIGINT UNSIGNED NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL, INDEX(active,next_run_at)
+) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS audit_logs (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, user_id BIGINT UNSIGNED NULL, action VARCHAR(80) NOT NULL,
  entity_type VARCHAR(80) NOT NULL, entity_id BIGINT UNSIGNED NULL, details_json JSON NULL,
@@ -255,17 +266,7 @@ CREATE TABLE IF NOT EXISTS knowledge_base_items (
  stored_name VARCHAR(255) NULL, original_name VARCHAR(255) NULL, mime_type VARCHAR(120) NULL,
  extracted_text LONGTEXT NULL, created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL,
  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
- FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL,
- FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL, INDEX(item_type,updated_at)
-) ENGINE=InnoDB;
-CREATE TABLE IF NOT EXISTS lead_magnets (
- id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, user_id BIGINT UNSIGNED NOT NULL,
- title VARCHAR(190) NOT NULL, magnet_type VARCHAR(80) NOT NULL, other_type VARCHAR(190) NULL,
- target_audience TEXT NOT NULL, desired_outcome TEXT NULL, audience_problem TEXT NULL,
- tone VARCHAR(120) NULL, call_to_action TEXT NULL, brand_requirements TEXT NULL, additional_instructions TEXT NULL,
- content_html LONGTEXT NULL, status ENUM('draft','published','archived') NOT NULL DEFAULT 'draft',
- public_slug VARCHAR(80) NULL UNIQUE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
- updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAM…3262 tokens truncated…me VARCHAR(190) NULL,
+…3469 tokens truncated…me VARCHAR(190) NULL,
  from_address VARCHAR(320) NOT NULL, reply_to VARCHAR(320) NULL, smtp_host VARCHAR(255) NOT NULL,
  smtp_port SMALLINT UNSIGNED NOT NULL DEFAULT 587, smtp_encryption ENUM('none','tls','ssl') NOT NULL DEFAULT 'tls',
  smtp_username VARCHAR(320) NULL, smtp_password_enc TEXT NULL, hourly_limit INT UNSIGNED NOT NULL DEFAULT 100,

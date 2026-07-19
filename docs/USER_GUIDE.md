@@ -32,6 +32,7 @@ Only a record's creator, owner, or system administrator can change it. Users wit
 
 - Conversations keep contact email threads, ownership, unread status, templates, signatures, and opportunity context together.
 - Administrators can configure multiple authenticated sending mailboxes with health monitoring and hourly/daily delivery limits.
+- Administrators can schedule weekly pipeline and month-end new-contact reports for email delivery.
 - Workflows react to contact, tag, form, booking, and pipeline events, then run email, tag, owner, alert, and wait steps.
 - Resources publishes a gated library of files, links, and lead magnets while tracking contact engagement.
 
