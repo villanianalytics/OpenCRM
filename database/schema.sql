@@ -198,20 +198,7 @@ CREATE TABLE IF NOT EXISTS custom_field_conditions (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, custom_field_id BIGINT UNSIGNED NOT NULL,
  depends_on_field_id BIGINT UNSIGNED NOT NULL, operator ENUM('equals','not_equals','is_empty','not_empty') NOT NULL DEFAULT 'equals', expected_value TEXT NULL,
  FOREIGN KEY(custom_field_id) REFERENCES custom_fields(id) ON DELETE CASCADE,
- FOÁnÌ¢Gß≤⁄Óù∆≠y“(80) NOT NULL UNIQUE, destination_url VARCHAR(2000) NOT NULL,
- campaign_name VARCHAR(190) NULL, channel VARCHAR(120) NULL, variant VARCHAR(120) NULL,
- active BOOLEAN NOT NULL DEFAULT TRUE, created_by BIGINT UNSIGNED NULL, updated_by BIGINT UNSIGNED NULL,
- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
- FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL,
- FOREIGN KEY(updated_by) REFERENCES users(id) ON DELETE SET NULL, INDEX(active,created_at)
-) ENGINE=InnoDB;
-CREATE TABLE IF NOT EXISTS promotional_link_clicks (
- id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, promotional_link_id BIGINT UNSIGNED NOT NULL,
- clicked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, visitor_hash CHAR(64) NOT NULL,
- referrer VARCHAR(2000) NULL, user_agent VARCHAR(1000) NULL, device_type VARCHAR(30) NOT NULL DEFAULT 'Other',
- utm_source VARCHAR(190) NULL, utm_medium VARCHAR(190) NULL, utm_campaign VARCHAR(190) NULL,
- query_json JSON NULL,
- FOREIGN KEY(promotional_link_id) REFERENCES promotional_links(id) ON DELETE CASCADE,
+ FOÛ›-¢Gß≤⁄Óù∆≠y”CADE,
  INDEX(promotional_link_id,clicked_at), INDEX(promotional_link_id,visitor_hash)
 ) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS knowledge_base_items (
@@ -372,6 +359,18 @@ CREATE TABLE IF NOT EXISTS bookings (
  FOREIGN KEY(meeting_type_id) REFERENCES booking_meeting_types(id), FOREIGN KEY(calendar_id) REFERENCES booking_calendars(id),
  FOREIGN KEY(assigned_user_id) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE SET NULL,
  FOREIGN KEY(session_id) REFERENCES site_sessions(id) ON DELETE SET NULL, INDEX(assigned_user_id,starts_at), INDEX(calendar_id,starts_at)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_questions (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, meeting_type_id BIGINT UNSIGNED NOT NULL, label VARCHAR(190) NOT NULL,
+ field_key VARCHAR(80) NOT NULL, field_type ENUM('text','textarea','select','checkbox') NOT NULL DEFAULT 'text',
+ options_json JSON NULL, required BOOLEAN NOT NULL DEFAULT FALSE, position INT NOT NULL DEFAULT 0,
+ UNIQUE(meeting_type_id,field_key), FOREIGN KEY(meeting_type_id) REFERENCES booking_meeting_types(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS booking_notification_log (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, booking_id BIGINT UNSIGNED NOT NULL, notification_type VARCHAR(40) NOT NULL,
+ recipient VARCHAR(190) NOT NULL, scheduled_for DATETIME NULL, sent_at DATETIME NULL, status ENUM('pending','sent','failed') NOT NULL DEFAULT 'pending',
+ error_message VARCHAR(500) NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(booking_id) REFERENCES bookings(id) ON DELETE CASCADE, INDEX(status,scheduled_for), UNIQUE(booking_id,notification_type,recipient)
 ) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS calendar_connections (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, user_id BIGINT UNSIGNED NOT NULL, provider ENUM('google','microsoft','caldav') NOT NULL,
