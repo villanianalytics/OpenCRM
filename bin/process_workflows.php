@@ -40,7 +40,7 @@ foreach($due as $e){
             elseif($type==='create_alert'){$uid=(int)($step['user_id']?:$e['owner_id']?:$e['created_by']);db()->prepare('INSERT INTO reminders(contact_id,user_id,message,due_at) VALUES(?,?,?,DATE_ADD(NOW(),INTERVAL ? MINUTE))')->execute([$e['contact_id'],$uid,wf_merge((string)($step['message']??'Workflow follow-up'),$e),max(0,(int)($step['delay_minutes']??0))]);}
             elseif($type==='send_email'){
                 if(!filter_var($e['email'],FILTER_VALIDATE_EMAIL))throw new RuntimeException('Contact email is invalid.');
-                $subject=wf_merge((string)($step['subject']??''),$e);$body=wf_merge((string)($step['body']??''),$e);send_mail($e['email'],$subject,$body);
+                $subject=wf_merge((string)($step['subject']??''),$e);$body=wf_merge((string)($step['body']??''),$e);crm_send_email($e['email'],$subject,$body,false);
                 db()->prepare('INSERT INTO email_threads(contact_id,subject,last_message_at,created_by) VALUES(?,?,NOW(),?)')->execute([$e['contact_id'],$subject,$e['created_by']?:null]);$threadId=(int)db()->lastInsertId();
                 db()->prepare("INSERT INTO email_messages(thread_id,direction,from_address,to_address,subject,body_text,delivery_status,sent_at) VALUES(?,'outbound',?,?,?,?, 'sent',NOW())")->execute([$threadId,app_setting('mail_from_address'),$e['email'],$subject,$body]);
             }else throw new RuntimeException('Unknown workflow action: '.$type);
