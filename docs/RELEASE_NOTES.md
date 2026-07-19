@@ -8,6 +8,7 @@
 - Preserved consent, unsubscribe, suppression, bounce, and complaint controls across pooled campaign delivery.
 - Added automatic XML sitemaps and robots directives for published sites.
 - Added site and page SEO management with search previews, metadata validation, canonical URLs, social cards, indexing controls, Search Console verification, image/H1 checks, and Schema.org JSON-LD configuration.
+- Added secure self-service password recovery through branded email, with expiring single-use tokens, rate limiting, generic account-discovery-safe responses, and audit logging.
 
 ## 2026-07-19
 

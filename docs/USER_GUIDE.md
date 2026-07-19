@@ -1,5 +1,9 @@
 # OpenCRM User Guide
 
+## Signing in and password recovery
+
+Use **Forgot your password?** on the sign-in screen and enter your username or account email. If the account is active and has an email address, OpenCRM sends a single-use reset link that expires after 60 minutes. Choose a password of at least 12 characters. Used and superseded links cannot be reused; contact an administrator if the account has no email address.
+
 ## Getting started
 
 Sign in, then select your username to configure display name, timezone, contact auto-tags, alert delivery, and connected calendars. Contacts opens to **My Contacts** by default. Use **Actions** to switch scope, import/export, manage saved views, or start bulk reassignment.

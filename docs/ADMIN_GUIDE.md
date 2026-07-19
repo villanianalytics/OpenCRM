@@ -11,6 +11,7 @@ Use Admin settings to set the application name, logo, color scheme, New York or 
 - Record changes require creator, owner, or administrator status; visible users may add notes.
 - API users can be create-only to prevent automation from altering existing records.
 - Credentials are encrypted in application settings or supplied through the server environment. Never commit `.env`, tokens, keys, exports, uploads, or logs.
+- Self-service password resets use hashed, single-use tokens that expire after 60 minutes. Public responses never disclose whether a username or email exists, and requests are rate-limited by source address.
 
 ## Role permissions
 
