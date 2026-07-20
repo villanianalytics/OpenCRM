@@ -1,5 +1,7 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__.'/ai_builder.php';
+require_once __DIR__.'/routes_ai_builders.php';
 function form_row(int $id):array{$s=db()->prepare('SELECT * FROM crm_forms WHERE id=?');$s->execute([$id]);$r=$s->fetch();if(!$r){http_response_code(404);exit('Form not found');}return $r;}
 function form_fields(int $id):array{$s=db()->prepare('SELECT * FROM crm_form_fields WHERE form_id=? ORDER BY position,id');$s->execute([$id]);$rows=$s->fetchAll();foreach($rows as &$r)$r['config']=json_decode((string)$r['options_json'],true)?:[];return $rows;}
 function form_condition(array $cfg,array $values):bool{if(empty($cfg['condition_key']))return true;$actual=(string)($values[$cfg['condition_key']]??'');$want=(string)($cfg['condition_value']??'');return match($cfg['condition_operator']??'equals'){'not_equals'=>$actual!==$want,'contains'=>stripos($actual,$want)!==false,'empty'=>$actual==='','not_empty'=>$actual!=='',default=>$actual===$want};}
