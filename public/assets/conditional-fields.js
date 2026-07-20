@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
   move(promotions,[['/events','Events'],['/promotions/links','Promotional links'],['/promotions/links/stats','Link analytics'],['/promotions/attribution','Marketing attribution'],['/lead-magnets','Lead magnets'],['/communications','Conversations']]);
   move(automation,[['/workflows','Workflows'],['/reports','Reports']]);
   move(pages,[['/resources','Resources'],['/sites','Sites & landing pages'],['/forms','Forms'],['/bookings','Bookings']]);
+  const addAi=(permissionHref,href,label)=>{if(nav.querySelector(`a[href="${permissionHref}"]`)&&!pages.querySelector(`a[href="${href}"]`)){const link=document.createElement('a');link.href=href;link.textContent=label;pages.querySelector('div').append(link)}};
+  addAi('/sites','/sites/ai/new','AI Site Builder');addAi('/forms','/forms/ai/new','AI Form Builder');addAi('/resources','/resources/ai/new','AI Resource Page Builder');
   const placeGroups=()=>{const anchor=nav.querySelector(':scope > a[href="/help"]')||(admin?.parentElement===nav?admin:null);[sales,promotions,automation,pages].forEach(group=>{if(group.querySelector('a'))nav.insertBefore(group,anchor);else group.remove()})};
   placeGroups();
   const markActive=()=>{nav.querySelectorAll('a').forEach(link=>{const href=link.getAttribute('href');link.classList.toggle('active',href==='/'?location.pathname==='/':location.pathname===href||location.pathname.startsWith(href+'/'))});nav.querySelectorAll('.nav-submenu').forEach(group=>group.classList.toggle('has-active',!!group.querySelector('a.active')))};
