@@ -35,6 +35,9 @@ $contactColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS 
 if(!in_array('company_id',$contactColumns,true))db()->exec('ALTER TABLE contacts ADD company_id BIGINT UNSIGNED NULL AFTER company');
 if(!in_array('owner_id',$contactColumns,true))db()->exec('ALTER TABLE contacts ADD owner_id BIGINT UNSIGNED NULL AFTER created_by');
 if(!in_array('active',$contactColumns,true))db()->exec('ALTER TABLE contacts ADD active BOOLEAN NOT NULL DEFAULT TRUE AFTER website');
+if(!in_array('linkedin_url',$contactColumns,true))db()->exec('ALTER TABLE contacts ADD linkedin_url VARCHAR(500) NULL AFTER website');
+$reminderColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='reminders'")->fetchAll(PDO::FETCH_COLUMN);
+if(!in_array('recurrence_days',$reminderColumns,true))db()->exec('ALTER TABLE reminders ADD recurrence_days SMALLINT UNSIGNED NULL AFTER due_at');
 $opportunityColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='opportunities'")->fetchAll(PDO::FETCH_COLUMN);
 if(!in_array('owner_id',$opportunityColumns,true))db()->exec('ALTER TABLE opportunities ADD owner_id BIGINT UNSIGNED NULL AFTER contact_id');
 if(!in_array('active',$opportunityColumns,true))db()->exec('ALTER TABLE opportunities ADD active BOOLEAN NOT NULL DEFAULT TRUE AFTER probability');
@@ -99,4 +102,3 @@ if($adminUsername!==''&&$adminPassword!==''){
 }
 $settingSave=db()->prepare('INSERT INTO app_settings(setting_key,setting_value) VALUES(?,?) ON DUPLICATE KEY UPDATE setting_value=IF(setting_value=\'\',VALUES(setting_value),setting_value)');$adminContact=db()->query("SELECT email FROM users WHERE is_admin=1 AND email IS NOT NULL AND email<>'' ORDER BY id LIMIT 1")->fetchColumn();$fallbackEmail=$adminContact?:app_setting('mail_from_address');if($fallbackEmail){$settingSave->execute(['operational_alert_email',$fallbackEmail]);$settingSave->execute(['legal_contact_email',$fallbackEmail]);}$settingSave->execute(['legal_company_name',app_setting('app_name','OpenCRM')]);
 echo "Migration complete.\n";
-
