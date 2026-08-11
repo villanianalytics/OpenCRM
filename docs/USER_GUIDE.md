@@ -18,6 +18,8 @@ Sign in, then select your username to configure display name, timezone, contact 
 
 Only a record's creator, owner, or system administrator can change it. Users with visibility may still add notes. Inactive contacts and archived opportunities remain available for search and reporting.
 
+For imports, start with the synthetic [contact CSV example](examples/contact-import.csv). Preview the file before confirming it, review which rows will create, update, or need attention, and export a backup before a large ownership or data change.
+
 ## Marketing tools
 
 - Events track presentations, presenters, attendees, links, addresses, and slides.
@@ -27,6 +29,8 @@ Only a record's creator, owner, or system administrator can change it. Users wit
 - Sites embed CRM forms and booking pages and attribute resulting conversions.
 - Site and page SEO tools manage search previews, metadata, social cards, structured data, sitemaps, robots directives, redirects, and indexing checks.
 - Marketing attribution compares first-touch, last-touch, and linear multi-touch credit across conversions and paid revenue.
+
+Published forms, booking pages, promotional redirects, published lead magnets, and resource portals are accessible without a CRM login when configured as public. Preview them in a private browser window before sharing. Private forms and editing screens require an authenticated, permitted user.
 
 ## Conversations, workflows, and resources
 
@@ -44,3 +48,9 @@ Maintain products under Quotes, create a branded proposal, and email its public 
 
 Select **Help** in OpenCRM or visit `/help` for searchable, task-specific instructions.
 
+## Common examples
+
+- **Event follow-up:** import attendees, let the event tag identify attendance, save a report filtered to that tag, and create owned reminders.
+- **Channel comparison:** create separate links for LinkedIn Day 1, LinkedIn Day 2, and Instagram while pointing all three at one public form; compare campaign/channel/variant analytics.
+- **Stale contacts:** build a contact report using a last-updated date older than 30 days and save it.
+- **Lead handoff:** assign the owner, create an opportunity, add context in opportunity notes, and assign a recurring alert.

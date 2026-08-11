@@ -19,4 +19,3 @@ foreach($markers as $marker=>$found)if(!$found)throw new RuntimeException('Datab
 exec('tar -tzf '.escapeshellarg($uploadsFile).' 2>&1',$listing,$code);if($code!==0||!in_array('uploads/',$listing,true))throw new RuntimeException('Upload archive verification failed.');
 file_put_contents($base.'/last_verified.json',json_encode(['manifest'=>basename($manifestPath),'verified_at'=>(new DateTimeImmutable())->format(DateTimeInterface::ATOM)],JSON_PRETTY_PRINT));
 app_log('info','Backup verification passed',['manifest'=>basename($manifestPath)]);operational_notify('backup_verification','healthy','Backup integrity verification passed.',['manifest'=>basename($manifestPath)]);echo 'Backup verified: '.basename($manifestPath).PHP_EOL;
-
