@@ -42,6 +42,12 @@ The schema is organized around contacts/companies/tags/custom fields, opportunit
 - SES and Stripe webhooks validate provider signatures.
 - Audit logs answer who changed application records; application logs support operational diagnosis.
 
+## Smart cache
+
+Expensive list, dashboard, and report queries use revision-tagged cached results. Each entry records dependency keys such as `contacts`, `opportunities`, `reports:contacts`, and individual entity identifiers. Mutations through the application or contact API increment the affected database-backed revisions in the same transaction as the change. A cached result is reused only while its revision snapshot still matches; unrelated entries remain valid. APCu is used when available, with `storage/cache` as a private filesystem fallback. Time-dependent queries also retain a short TTL.
+
+Direct database edits bypass application invalidation. After an approved direct SQL change, clear the smart cache from the administrator screen or increment the applicable revision keys.
+
 ## Extending OpenCRM
 
 For a new module:

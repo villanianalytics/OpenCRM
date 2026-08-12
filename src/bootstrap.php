@@ -37,6 +37,7 @@ function db(): PDO {
     }
     return $pdo;
 }
+require_once __DIR__.'/smart_cache.php';
 
 function e(mixed $value): string { return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
 function redirect(string $path): never { header('Location: ' . $path); exit; }
@@ -73,6 +74,7 @@ function audit(string $action, string $entity, ?int $entityId = null, array $det
     if($entityId&&!isset($details['record_label'])){$label=audit_record_label($entity,$entityId);if($label!==null)$details['record_label']=$label;}
     $stmt = db()->prepare('INSERT INTO audit_logs (user_id, action, entity_type, entity_id, details_json, ip_address) VALUES (?, ?, ?, ?, ?, ?)');
     $stmt->execute([user()['id'] ?? null, $action, $entity, $entityId, json_encode($details), $_SERVER['REMOTE_ADDR'] ?? null]);
+    smart_cache_invalidate_for($action,$entity,$entityId,$details);
     app_log('info',ucwords(str_replace('_',' ',$action)).' '.$entity,['entity_id'=>$entityId]+$details);
 }
 function record_contact_changes(int $contactId,array $before,array $after): void {

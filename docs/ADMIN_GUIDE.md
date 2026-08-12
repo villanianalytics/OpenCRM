@@ -27,6 +27,8 @@ Maintain tags and tag groups, custom fields and groupings, conditional field rul
 
 Audit reports show logins and record actions. Application logs capture configured request/payload detail and can be purged by age. System health covers database, storage, runtime, and scheduled integration jobs. Lightsail snapshots protect the server, but database/export recovery procedures should still be tested periodically.
 
+Smart cache shows the active APCu or filesystem backend, hit/miss/rebuild activity, dependency revisions, and stored size. Application and API writes invalidate affected CRM dependencies automatically. Use **Clear smart cache** after an approved direct database edit or when diagnosing cached-query behavior; entries rebuild on demand.
+
 OpenCRM creates a daily checksummed database/upload backup, verifies the latest backup daily, retains 30 days, and performs an hourly health check. Results are written to application logs and `storage/logs/cron.log`. See `docs/OPERATIONS.md` for commands and recovery steps.
 
 ## Email compliance and payments

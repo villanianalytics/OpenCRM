@@ -39,6 +39,7 @@ php tests/api_smoke.php
 php tests/permissions_smoke.php
 php tests/expanded_smoke.php
 php tests/readiness_smoke.php
+php tests/cache_smoke.php
 ```
 
 Some suites create and remove test data. Do not run them against a production database unless you have reviewed the current test implementation and explicitly accept that behavior.

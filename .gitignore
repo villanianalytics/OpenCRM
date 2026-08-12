@@ -18,5 +18,7 @@
 !/storage/uploads/.gitkeep
 /storage/logs/*
 !/storage/logs/.gitkeep
+/storage/cache/*
+!/storage/cache/.gitkeep
 /storage/backups/*
 !/storage/backups/.gitkeep

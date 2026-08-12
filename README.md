@@ -13,6 +13,7 @@ OpenCRM is a self-hosted, lightweight CRM built with PHP and MySQL. It combines 
 - Booking pages with individual, round-robin, and collective calendars plus Google, Microsoft, CalDAV, and optional Easy!Appointments integration
 - Email conversations, templates, SMTP mailbox pools, consent/suppression controls, and event-driven workflows
 - Granular feature permissions, record ownership rules, tag-level access, API create-only mode, audit trails, operational health checks, and verified backups
+- Dependency-aware smart caching that invalidates only affected contact, opportunity, dashboard, and report results
 
 ## Requirements
 

@@ -28,6 +28,7 @@ Backups live in `storage/backups`, include a compressed MySQL dump and uploads a
 - Inspect disk usage, backup age, verification status, and at least one off-host copy.
 - Apply operating-system, PHP, web-server, MySQL, and Composer security updates through a tested release process.
 - Review administrator accounts, API users, permissions, tag policies, and audit activity.
+- Review **Admin → Smart cache** for hit rate and rebuild activity. Clearing the cache is safe and causes results to rebuild on demand.
 
 ## Manual checks
 

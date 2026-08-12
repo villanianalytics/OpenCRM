@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added dependency-aware smart caching for contacts, opportunities, dashboard metrics, and reports with write-driven invalidation, APCu/filesystem backends, statistics, and an administrator clear-cache control.
 - Authenticated list and report pages now re-evaluate current database filters when opened or restored through browser history instead of displaying a stale in-memory result.
 - Added confirmed, permission- and ownership-protected opportunity deletion while preserving linked contacts and auditing the deleted opportunity details.
 - Added comprehensive installation, configuration, architecture, development, upgrade, API, security, contribution, and community documentation.
