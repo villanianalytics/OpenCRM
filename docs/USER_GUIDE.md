@@ -18,6 +18,8 @@ Sign in, then select your username to configure display name, timezone, contact 
 
 Only a record's creator, owner, or system administrator can change it. Users with visibility may still add notes. Inactive contacts and archived opportunities remain available for search and reporting.
 
+An opportunity creator, assigned owner, or system administrator with opportunity edit permission can permanently delete it from its detail page. Deletion also removes its opportunity notes but never deletes linked contacts; use it only for erroneous or unwanted records because it cannot be undone.
+
 For imports, start with the synthetic [contact CSV example](examples/contact-import.csv). Preview the file before confirming it, review which rows will create, update, or need attention, and export a backup before a large ownership or data change.
 
 ## Marketing tools

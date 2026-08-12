@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added confirmed, permission- and ownership-protected opportunity deletion while preserving linked contacts and auditing the deleted opportunity details.
 - Added comprehensive installation, configuration, architecture, development, upgrade, API, security, contribution, and community documentation.
 - Added synthetic contact import/API examples and GitHub issue/pull-request templates.
 - Corrected project requirements for Composer, Dompdf, PHP extensions, workers, HTTPS, permissions, and integration boundaries.
