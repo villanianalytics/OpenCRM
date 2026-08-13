@@ -9,9 +9,13 @@ try{
     $curl=curl_init(config('url').'/api/v1/contacts');curl_setopt_array($curl,[CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$token,'Content-Type: application/json'],CURLOPT_POSTFIELDS=>$payload]);
     $body=curl_exec($curl);$status=curl_getinfo($curl,CURLINFO_RESPONSE_CODE);if($body===false)throw new RuntimeException(curl_error($curl));curl_close($curl);$result=json_decode($body,true);
     if($status!==201||!($result['success']??false)||($result['tags']??[])!==[$tag,$tag2,$tag3])throw new RuntimeException("API create failed with HTTP $status.");$contactId=(int)$result['contact_id'];
+    $pdo->prepare("UPDATE api_users SET access_mode='create_only' WHERE id=?")->execute([$apiId]);$tag4=$tag.'_Existing';$payload=json_encode(['external_id'=>$external,'first_name'=>'Changed','last_name'=>'Name','email'=>$external.'@example.invalid','tags'=>$tag4.','.$tag2]);
+    $curl=curl_init(config('url').'/api/v1/contacts');curl_setopt_array($curl,[CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$token,'Content-Type: application/json'],CURLOPT_POSTFIELDS=>$payload]);$body=curl_exec($curl);$status=curl_getinfo($curl,CURLINFO_RESPONSE_CODE);if($body===false)throw new RuntimeException(curl_error($curl));curl_close($curl);$result=json_decode($body,true);
+    $check=$pdo->prepare('SELECT first_name FROM contacts WHERE id=?');$check->execute([$contactId]);$tagCheck=$pdo->prepare('SELECT COUNT(*) FROM contact_tags ct JOIN tags t ON t.id=ct.tag_id WHERE ct.contact_id=? AND t.name=?');$tagCheck->execute([$contactId,$tag4]);
+    if($status!==200||($result['action']??'')!=='tagged_existing'||($result['tags_added']??[])!==[$tag4]||$check->fetchColumn()!=='API'||(int)$tagCheck->fetchColumn()!==1)throw new RuntimeException("Create-only existing-contact tagging failed with HTTP $status.");
     echo "API smoke test passed.\n";
 }finally{
     if($apiId){$pdo->prepare("DELETE FROM audit_logs WHERE details_json->>'$.api_user_id'=?")->execute([(string)$apiId]);$pdo->prepare('DELETE FROM api_users WHERE id=?')->execute([$apiId]);}
     if($contactId)$pdo->prepare('DELETE FROM contacts WHERE id=?')->execute([$contactId]);
-    $cleanup=$pdo->prepare('DELETE FROM tags WHERE name IN (?,?,?)');$cleanup->execute([$tag,$tag2,$tag3]);
+    $cleanup=$pdo->prepare('DELETE FROM tags WHERE name IN (?,?,?,?)');$cleanup->execute([$tag,$tag2,$tag3,$tag4??'']);
 }

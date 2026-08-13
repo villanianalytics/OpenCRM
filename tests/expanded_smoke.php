@@ -12,4 +12,3 @@ try{
     $pdo->prepare("INSERT INTO email_suppressions(email,reason,source) VALUES(?,'manual','smoke')")->execute(['expanded-smoke@example.invalid']);if(!(int)$pdo->query("SELECT COUNT(*) FROM email_suppressions WHERE email='expanded-smoke@example.invalid' AND released_at IS NULL")->fetchColumn())throw new RuntimeException('Email suppression failed');
     $pdo->rollBack();echo "Expanded smoke tests passed.\n";
 }catch(Throwable $e){if($pdo->inTransaction())$pdo->rollBack();fwrite(STDERR,$e->getMessage()."\n");exit(1);}
-

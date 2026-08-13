@@ -2,7 +2,7 @@
 
 ## Contact API and GoHighLevel
 
-Create an API user under Admin settings and copy its token once. Prefer create-only access for inbound lead synchronization. Send standard contact fields as flat key/value pairs. Tags may be supplied as `tag`, `tag1`, `tag2`, and continuing numbered keys. Custom fields use `custom_Field_Name`, for example `custom_Customer_Type`. Contact notes may be included in the creation request.
+Create an API user under Admin settings and copy its token once. Prefer create-only access for inbound lead synchronization. Send a JSON object with standard contact fields as top-level keys. Tags may be supplied as `tag`, `tag1`, `tag2`, and continuing numbered keys. Custom fields use `custom_Field_Name`, for example `custom_Customer_Type`. Contact notes may be included when creating a record or when using an upsert token; a create-only token will not change notes on an existing match.
 
 Never place an API token in a public URL, browser script, repository, screenshot, or support ticket.
 
@@ -24,3 +24,4 @@ Use Application logs, Audit report, Calendar connection health, Booking engine t
 
 Copy-ready contact API and webhook request bodies are available in `docs/API_EXAMPLES.md`.
 
+The authoritative endpoint contract is [API_REFERENCE.md](API_REFERENCE.md). Always test with synthetic data and a dedicated least-privilege API user before enabling a live workflow.
