@@ -111,19 +111,15 @@ The migration is idempotent. It creates the administrator only if the supplied u
 
 ## 8. Schedule workers
 
-Create `/etc/cron.d/opencrm` and adjust the path if needed:
+Install the supplied schedule and adjust the path if needed:
 
-```cron
-* * * * * www-data php /var/www/opencrm/bin/process_email_queue.php >> /var/www/opencrm/storage/logs/cron.log 2>&1
-* * * * * www-data php /var/www/opencrm/bin/process_workflows.php >> /var/www/opencrm/storage/logs/cron.log 2>&1
-*/5 * * * * www-data php /var/www/opencrm/bin/send_booking_reminders.php >> /var/www/opencrm/storage/logs/cron.log 2>&1
-*/5 * * * * www-data php /var/www/opencrm/bin/send_scheduled_reports.php >> /var/www/opencrm/storage/logs/cron.log 2>&1
-*/5 * * * * www-data php /var/www/opencrm/bin/sync_booking_calendars.php >> /var/www/opencrm/storage/logs/cron.log 2>&1
-17 2 * * * www-data php /var/www/opencrm/bin/backup.php >> /var/www/opencrm/storage/logs/cron.log 2>&1
-45 2 * * * www-data php /var/www/opencrm/bin/verify_backup.php >> /var/www/opencrm/storage/logs/cron.log 2>&1
-12 * * * * www-data php /var/www/opencrm/bin/health_check.php >> /var/www/opencrm/storage/logs/cron.log 2>&1
-22 * * * * www-data php /var/www/opencrm/bin/check_calendar_connections.php >> /var/www/opencrm/storage/logs/cron.log 2>&1
+```bash
+sudo install -o root -g root -m 0644 deploy/opencrm.cron /etc/cron.d/opencrm
+sudo install -o root -g root -m 0644 deploy/opencrm.logrotate /etc/logrotate.d/opencrm
+sudo logrotate --debug /etc/logrotate.d/opencrm
 ```
+
+The schedule uses `flock` to prevent overlapping workers and writes only to application-owned log paths. Remove older per-worker cron definitions before enabling it to avoid duplicate execution.
 
 Custom-domain provisioning requires root privileges and should only be enabled after reviewing `bin/provision_site_domains.php`, DNS validation, Apache, and Certbot behavior. Do not run it as the web-server user.
 

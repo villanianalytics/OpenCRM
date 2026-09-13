@@ -18,6 +18,8 @@ The exact cadence can be adjusted for load, but production should schedule every
 
 Run commands as the restricted account that owns application storage (commonly `www-data`). Use overlap prevention if a worker could run longer than its interval. `bin/provision_site_domains.php` has elevated web-server and Certificate Authority effects; review and schedule it separately as root only when custom domains are enabled.
 
+The supported production definitions are provided in `deploy/opencrm.cron` and `deploy/opencrm.logrotate`. Keep worker output under `storage/logs`; an unprivileged worker generally cannot create files directly in `/var/log`.
+
 Backups live in `storage/backups`, include a compressed MySQL dump and uploads archive, have SHA-256 checksums, and are retained for 30 days. Copy backup sets off the instance; Lightsail snapshots complement rather than replace application backups.
 
 ## Routine checks
