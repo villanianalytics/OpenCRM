@@ -1,5 +1,9 @@
 # OpenCRM User Guide
 
+## Phones and tablets
+
+OpenCRM uses the same secure application on desktop, tablet, and mobile devices. On a narrow screen, use the menu button in the top-right corner to open navigation. Data tables become labeled record cards on phones, while pipeline stages remain horizontally swipeable. Administrative settings use a horizontally scrollable section selector on tablets and phones. All primary buttons and form controls are sized for touch; rotate the device when a visual builder benefits from additional width.
+
 ## Signing in and password recovery
 
 Use **Forgot your password?** on the sign-in screen and enter your username or account email. If the account is active and has an email address, OpenCRM sends a single-use reset link that expires after 60 minutes. Choose a password of at least 12 characters. Used and superseded links cannot be reused; contact an administrator if the account has no email address.

@@ -21,6 +21,7 @@ if(!str_contains($index,"if(preg_match('#^/contacts/(\\d+)$#',\$path,\$m)){requi
 if(!str_contains($index,'id="contact-filters"')||!str_contains($index,'Apply filters'))throw new RuntimeException('Server-rendered contact filter panel is absent.');
 if(!str_contains($index,'WHERE LOWER(u.username)=? AND u.active=1')||!str_contains($index,'$loginKey=mb_strtolower($loginName)'))throw new RuntimeException('Case-insensitive login lookup is absent.');
 if(!str_contains($index,"require dirname(__DIR__) . '/src/routes_entra_sso.php'"))throw new RuntimeException('Microsoft SSO routes are not loaded.');
+if(!str_contains($index,'/assets/mobile-ui.js')||!is_file(dirname(__DIR__).'/public/assets/mobile-ui.js'))throw new RuntimeException('Responsive table and navigation behavior is absent.');
 $sso=file_get_contents(dirname(__DIR__).'/src/routes_entra_sso.php');
 foreach(['code_challenge_method','S256','entra_oauth','hash_equals','graph.microsoft.com/v1.0/me','entra_object_id'] as $needle)if(!str_contains($sso,$needle))throw new RuntimeException('Microsoft SSO security control is absent: '.$needle);
 
