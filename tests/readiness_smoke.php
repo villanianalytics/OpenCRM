@@ -12,4 +12,3 @@ try{
     if(!str_contains(legal_default_privacy(),'collects contact information')||!str_contains(legal_footer_html(),'/legal/privacy'))throw new RuntimeException('Legal policy rendering failed.');
     $pdo->rollBack();app_settings(true);echo "Readiness smoke tests passed.\n";
 }catch(Throwable $e){if($pdo->inTransaction())$pdo->rollBack();app_settings(true);fwrite(STDERR,$e->getMessage()."\n");exit(1);}
-

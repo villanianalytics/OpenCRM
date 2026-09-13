@@ -17,4 +17,3 @@ try{
     foreach(glob($dir.'/opencrm_*')?:[] as $file)if(filemtime($file)<time()-30*86400)unlink($file);
     app_log('info','Automated backup completed',['manifest'=>basename($prefix.'_manifest.json')]);operational_notify('backup','healthy','Automated backup completed successfully.',['manifest'=>basename($prefix.'_manifest.json')]);echo $prefix.'_manifest.json'.PHP_EOL;
 }finally{@unlink($defaults);}
-

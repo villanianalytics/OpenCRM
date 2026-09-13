@@ -1,6 +1,8 @@
 {
   "name": "villanianalytics/opencrm",
   "description": "Lightweight PHP CRM",
+  "license": "MIT",
+  "homepage": "https://github.com/villanianalytics/OpenCRM",
   "type": "project",
   "require": {
     "php": "^8.2",

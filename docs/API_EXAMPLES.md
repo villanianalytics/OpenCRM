@@ -1,5 +1,7 @@
 # OpenCRM API Examples
 
+> The complete contract, supported fields, status handling, and security guidance are in [API_REFERENCE.md](API_REFERENCE.md). These examples are intentionally synthetic.
+
 ## Authentication
 
 Create an API user under **Admin → API users**, copy the token once, and send it as a bearer token. Use `create_only` for integrations that must never change existing contacts.
@@ -29,7 +31,7 @@ curl -X POST "https://rapidanalyticssoftware.com/api/v1/contacts" \
   }'
 ```
 
-GoHighLevel may send the same names as flat key/value form fields instead of JSON. Keep `custom_Customer_Type` at the top level. Tags may continue as `tag3`, `tag4`, and so on.
+In GoHighLevel, configure a JSON request body and map its individual key/value rows to these top-level JSON properties. Keep `custom_Customer_Type` at the top level. Tags may continue as `tag3`, `tag4`, and so on. Form-encoded bodies are not accepted by OpenCRM 1.0.
 
 ## SES events
 
@@ -42,4 +44,3 @@ Create a Stripe webhook for `checkout.session.completed` using the endpoint disp
 ## Safety
 
 Never put tokens in URLs, client-side JavaScript, screenshots, source control, or public logs. Rotate a token immediately if it is exposed.
-

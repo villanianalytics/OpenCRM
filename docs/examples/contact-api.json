@@ -1,0 +1,11 @@
+{
+  "first_name": "Ada",
+  "last_name": "Lovelace",
+  "email": "ada@example.com",
+  "phone": "+1 212 555 0100",
+  "company": "Analytical Engines Inc",
+  "tag": "Website Lead",
+  "tag1": "Newsletter",
+  "custom_Customer_Type": "Prospect",
+  "notes": "Synthetic API documentation example."
+}

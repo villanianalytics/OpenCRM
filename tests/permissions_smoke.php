@@ -13,4 +13,3 @@ $path='/promotions/links';if(!can('events.edit')||!can('promotional_links.view')
 $path='/contacts';if(can('contacts.view'))throw new RuntimeException('Contact permission leaked from another module');
 
 echo "Permission smoke tests passed.\n";
-

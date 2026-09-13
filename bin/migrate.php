@@ -62,6 +62,8 @@ db()->exec('UPDATE contacts SET owner_id=created_by WHERE owner_id IS NULL AND c
 
 $formColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='crm_forms'")->fetchAll(PDO::FETCH_COLUMN);
 if(!in_array('submit_label',$formColumns,true))db()->exec("ALTER TABLE crm_forms ADD submit_label VARCHAR(120) NOT NULL DEFAULT 'Submit' AFTER thank_you_message");
+$submissionColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='crm_form_submissions'")->fetchAll(PDO::FETCH_COLUMN);
+if(!in_array('matched_existing',$submissionColumns,true))db()->exec('ALTER TABLE crm_form_submissions ADD matched_existing BOOLEAN NOT NULL DEFAULT FALSE AFTER ip_hash');
 $promoColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='promotional_links'")->fetchAll(PDO::FETCH_COLUMN);
 if(!in_array('campaign_name',$promoColumns,true))db()->exec('ALTER TABLE promotional_links ADD campaign_name VARCHAR(190) NULL AFTER destination_url');
 if(!in_array('channel',$promoColumns,true))db()->exec('ALTER TABLE promotional_links ADD channel VARCHAR(120) NULL AFTER campaign_name');
@@ -73,6 +75,11 @@ $bookingColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS 
 if(!in_array('meeting_url',$bookingColumns,true))db()->exec('ALTER TABLE bookings ADD meeting_url VARCHAR(2000) NULL AFTER external_appointment_id');
 if(!in_array('calendar_sync_status',$bookingColumns,true))db()->exec("ALTER TABLE bookings ADD calendar_sync_status ENUM('pending','synced','partial','failed') NOT NULL DEFAULT 'pending' AFTER meeting_url");
 if(!in_array('calendar_sync_error',$bookingColumns,true))db()->exec('ALTER TABLE bookings ADD calendar_sync_error VARCHAR(1000) NULL AFTER calendar_sync_status');
+if(!in_array('reserved_start',$bookingColumns,true)){
+    $duplicates=db()->query("SELECT COUNT(*) FROM (SELECT calendar_id,starts_at FROM bookings WHERE status='confirmed' GROUP BY calendar_id,starts_at HAVING COUNT(*)>1) d")->fetchColumn();
+    if((int)$duplicates>0)throw new RuntimeException('Cannot enable booking collision protection while duplicate confirmed calendar slots exist. Resolve them and rerun the migration.');
+    db()->exec("ALTER TABLE bookings ADD reserved_start DATETIME GENERATED ALWAYS AS (CASE WHEN status='confirmed' THEN starts_at ELSE NULL END) STORED AFTER status, ADD UNIQUE KEY bookings_calendar_reserved_unique(calendar_id,reserved_start)");
+}
 $connectionColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='calendar_connections'")->fetchAll(PDO::FETCH_COLUMN);if(!in_array('sync_status',$connectionColumns,true))db()->exec("ALTER TABLE calendar_connections ADD sync_status ENUM('pending','healthy','error') NOT NULL DEFAULT 'pending' AFTER active");if(!in_array('last_error',$connectionColumns,true))db()->exec('ALTER TABLE calendar_connections ADD last_error VARCHAR(500) NULL AFTER sync_status');
 $pageColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='site_pages'")->fetchAll(PDO::FETCH_COLUMN);
 if(!in_array('canonical_url',$pageColumns,true))db()->exec('ALTER TABLE site_pages ADD canonical_url VARCHAR(2000) NULL AFTER meta_description');
@@ -101,4 +108,5 @@ if($adminUsername!==''&&$adminPassword!==''){
     fwrite(STDERR,"No administrator created. Set ADMIN_USERNAME and ADMIN_PASSWORD, then run this migration again.\n");
 }
 $settingSave=db()->prepare('INSERT INTO app_settings(setting_key,setting_value) VALUES(?,?) ON DUPLICATE KEY UPDATE setting_value=IF(setting_value=\'\',VALUES(setting_value),setting_value)');$adminContact=db()->query("SELECT email FROM users WHERE is_admin=1 AND email IS NOT NULL AND email<>'' ORDER BY id LIMIT 1")->fetchColumn();$fallbackEmail=$adminContact?:app_setting('mail_from_address');if($fallbackEmail){$settingSave->execute(['operational_alert_email',$fallbackEmail]);$settingSave->execute(['legal_contact_email',$fallbackEmail]);}$settingSave->execute(['legal_company_name',app_setting('app_name','OpenCRM')]);
+$sanitizePage=db()->prepare('UPDATE site_pages SET html=? WHERE id=?');foreach(db()->query('SELECT id,html FROM site_pages')->fetchAll() as $page){$clean=sanitize_site_html((string)$page['html']);if(!hash_equals((string)$page['html'],$clean))$sanitizePage->execute([$clean,$page['id']]);}
 echo "Migration complete.\n";

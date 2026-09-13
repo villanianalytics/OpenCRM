@@ -63,6 +63,13 @@ CREATE TABLE IF NOT EXISTS notes (
  body TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
  FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE CASCADE, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS opportunity_notes (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, opportunity_id BIGINT UNSIGNED NOT NULL, user_id BIGINT UNSIGNED NULL,
+ body TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(opportunity_id) REFERENCES opportunities(id) ON DELETE CASCADE,
+ FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL,
+ INDEX(opportunity_id,created_at)
+) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS contact_saved_views (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, user_id BIGINT UNSIGNED NOT NULL, name VARCHAR(100) NOT NULL,
  filters_json JSON NOT NULL, is_default BOOLEAN NOT NULL DEFAULT FALSE, position INT NOT NULL DEFAULT 100,
@@ -138,6 +145,10 @@ CREATE TABLE IF NOT EXISTS operational_alert_states (
 ) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS app_settings (
  setting_key VARCHAR(80) PRIMARY KEY, setting_value TEXT NULL,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS cache_revisions (
+ dependency_key VARCHAR(190) PRIMARY KEY, revision BIGINT UNSIGNED NOT NULL DEFAULT 1,
  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS reminders (
@@ -314,7 +325,7 @@ CREATE TABLE IF NOT EXISTS crm_form_rules (
 ) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS crm_form_submissions (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, form_id BIGINT UNSIGNED NOT NULL, contact_id BIGINT UNSIGNED NULL,
- values_json JSON NOT NULL, ip_hash CHAR(64) NOT NULL, submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ values_json JSON NOT NULL, ip_hash CHAR(64) NOT NULL, matched_existing BOOLEAN NOT NULL DEFAULT FALSE, submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
  FOREIGN KEY(form_id) REFERENCES crm_forms(id) ON DELETE CASCADE,
  FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE SET NULL, INDEX(form_id,submitted_at)
 ) ENGINE=InnoDB;
@@ -616,12 +627,17 @@ CREATE TABLE IF NOT EXISTS bookings (
  assigned_user_id BIGINT UNSIGNED NULL, contact_id BIGINT UNSIGNED NULL, session_id BIGINT UNSIGNED NULL,
  attendee_name VARCHAR(190) NOT NULL, attendee_email VARCHAR(190) NOT NULL, attendee_phone VARCHAR(80) NULL,
  starts_at DATETIME NOT NULL, ends_at DATETIME NOT NULL, timezone VARCHAR(80) NOT NULL, answers_json JSON NULL,
- status ENUM('confirmed','cancelled','completed','no_show') NOT NULL DEFAULT 'confirmed', cancel_token CHAR(64) NOT NULL UNIQUE,
+ status ENUM('confirmed','cancelled','completed','no_show') NOT NULL DEFAULT 'confirmed', reserved_start DATETIME GENERATED ALWAYS AS (CASE WHEN status='confirmed' THEN starts_at ELSE NULL END) STORED, cancel_token CHAR(64) NOT NULL UNIQUE,
  external_appointment_id BIGINT UNSIGNED NULL, meeting_url VARCHAR(2000) NULL, calendar_sync_status ENUM('pending','synced','partial','failed') NOT NULL DEFAULT 'pending', calendar_sync_error VARCHAR(1000) NULL,
  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
  FOREIGN KEY(meeting_type_id) REFERENCES booking_meeting_types(id), FOREIGN KEY(calendar_id) REFERENCES booking_calendars(id),
  FOREIGN KEY(assigned_user_id) REFERENCES users(id) ON DELETE SET NULL, FOREIGN KEY(contact_id) REFERENCES contacts(id) ON DELETE SET NULL,
- FOREIGN KEY(session_id) REFERENCES site_sessions(id) ON DELETE SET NULL, INDEX(assigned_user_id,starts_at), INDEX(calendar_id,starts_at)
+ FOREIGN KEY(session_id) REFERENCES site_sessions(id) ON DELETE SET NULL, INDEX(assigned_user_id,starts_at), INDEX(calendar_id,starts_at), UNIQUE(calendar_id,reserved_start)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS request_rate_limits (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, bucket VARCHAR(100) NOT NULL, identity_hash CHAR(64) NOT NULL,
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, INDEX(bucket,identity_hash,created_at), INDEX(created_at)
 ) ENGINE=InnoDB;
 CREATE TABLE IF NOT EXISTS booking_questions (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, meeting_type_id BIGINT UNSIGNED NOT NULL, label VARCHAR(190) NOT NULL,

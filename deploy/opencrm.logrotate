@@ -1,0 +1,23 @@
+/var/www/opencrm/storage/logs/*.log {
+    daily
+    rotate 14
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+    su www-data www-data
+    create 0640 www-data www-data
+}
+
+/var/log/opencrm-*.log {
+    weekly
+    rotate 8
+    missingok
+    notifempty
+    compress
+    delaycompress
+    copytruncate
+    su root adm
+    create 0640 root adm
+}

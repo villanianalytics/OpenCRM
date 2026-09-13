@@ -1,6 +1,16 @@
 # OpenCRM Release Notes
 
-## 1.0 Â· 2026-07-19
+## Unreleased
+
+- Added dependency-aware smart caching for contacts, opportunities, dashboard metrics, and reports with write-driven invalidation, APCu/filesystem backends, statistics, and an administrator clear-cache control.
+- Authenticated list and report pages now re-evaluate current database filters when opened or restored through browser history instead of displaying a stale in-memory result.
+- Added confirmed, permission- and ownership-protected opportunity deletion while preserving linked contacts and auditing the deleted opportunity details.
+- Added comprehensive installation, configuration, architecture, development, upgrade, API, security, contribution, and community documentation.
+- Added synthetic contact import/API examples and GitHub issue/pull-request templates.
+- Corrected project requirements for Composer, Dompdf, PHP extensions, workers, HTTPS, permissions, and integration boundaries.
+- Preserved the requested page across session expiry and allowed a same-origin stale login form to authenticate without a second trip to the login page.
+
+## 1.0 · 2026-07-19
 
 - Declared the first stable OpenCRM release.
 - Consolidated navigation into Contacts, Sales, Marketing, Engage, Reports, Help, and Admin.
@@ -26,4 +36,3 @@
 - Expanded contextual help, operations guidance, and copy-ready API examples.
 - Added deduplicated administrator incident emails with recovery notices and configurable thresholds.
 - Added admin-managed Privacy Policy, Terms, cookie notice, marketing consent, retention, company identity, and public legal links.
-

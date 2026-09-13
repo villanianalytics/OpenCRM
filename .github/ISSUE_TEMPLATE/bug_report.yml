@@ -1,0 +1,42 @@
+name: Bug report
+description: Report a reproducible OpenCRM defect (not a security vulnerability)
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not include credentials, tokens, personal data, or security vulnerabilities. Use the private process in SECURITY.md for security reports."
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v1.0.0 or commit SHA
+    validations:
+      required: true
+  - type: dropdown
+    id: installation
+    attributes:
+      label: Installation
+      options: [Fresh installation, Upgraded installation, Unknown]
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Include expected behavior and sanitized reproduction steps.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: PHP, MySQL/MariaDB, web server, operating system, and browser versions.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs
+      description: Remove authorization headers, cookies, keys, customer data, and internal addresses.
+      render: shell

@@ -15,7 +15,7 @@ function ai_builder_generate(string $kind,string $brief,array $catalog=[]):array
     $payload=json_encode(['model'=>app_setting('openai_model','gpt-5.4-mini'),'instructions'=>$instructions,'input'=>$input],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
     $ch=curl_init('https://api.openai.com/v1/responses');curl_setopt_array($ch,[CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>180,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$key,'Content-Type: application/json'],CURLOPT_POSTFIELDS=>$payload]);
     $raw=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_RESPONSE_CODE);$err=curl_error($ch);curl_close($ch);$response=json_decode((string)$raw,true);
-    if($status<200||$status>=300)throw new RuntimeException('OpenAI request failed: '.mb_strimwidth((string)($response['error']['message']??$err),0,260,'â€¦'));
+    if($status<200||$status>=300)throw new RuntimeException('OpenAI request failed: '.mb_strimwidth((string)($response['error']['message']??$err),0,260,'…'));
     $text=ai_builder_text(is_array($response)?$response:[]);$text=preg_replace('/^```(?:json)?\s*|\s*```$/i','',$text);
     $data=json_decode(trim((string)$text),true);if(!is_array($data))throw new RuntimeException('The AI response was not valid structured content. Please try again.');return $data;
 }
@@ -27,4 +27,3 @@ function ai_builder_html(string $html):string{
     return mb_substr(strip_tags($html,'<header><nav><main><section><article><aside><footer><div><span><h1><h2><h3><h4><p><ul><ol><li><strong><em><small><a><button><img><hr><br>'),0,180000);
 }
 function ai_builder_css(string $css):string{$css=preg_replace('/@import[^;]*;|url\s*\([^)]*\)|expression\s*\([^)]*\)|<\/style/iu','',$css);return mb_substr($css,0,80000);}
-

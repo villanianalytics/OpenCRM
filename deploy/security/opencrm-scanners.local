@@ -1,0 +1,12 @@
+[opencrm-scanners]
+enabled = true
+port = http,https
+filter = opencrm-scanners
+logpath = /var/log/apache2/opencrm-access.log
+backend = auto
+findtime = 10m
+maxretry = 4
+bantime = 24h
+bantime.increment = true
+bantime.factor = 2
+bantime.maxtime = 7d

@@ -1,0 +1,12 @@
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+* * * * * www-data flock -n /tmp/opencrm-email.lock php /var/www/opencrm/bin/process_email_queue.php >> /var/www/opencrm/storage/logs/cron.log 2>&1
+* * * * * www-data flock -n /tmp/opencrm-workflows.lock php /var/www/opencrm/bin/process_workflows.php >> /var/www/opencrm/storage/logs/workflows.log 2>&1
+*/5 * * * * www-data flock -n /tmp/opencrm-booking-reminders.lock php /var/www/opencrm/bin/send_booking_reminders.php >> /var/www/opencrm/storage/logs/booking-reminders.log 2>&1
+*/5 * * * * www-data flock -n /tmp/opencrm-reports.lock php /var/www/opencrm/bin/send_scheduled_reports.php >> /var/www/opencrm/storage/logs/scheduled-reports.log 2>&1
+*/5 * * * * www-data flock -n /tmp/opencrm-calendar-sync.lock php /var/www/opencrm/bin/sync_booking_calendars.php >> /var/www/opencrm/storage/logs/calendar-sync.log 2>&1
+12 * * * * www-data flock -n /tmp/opencrm-health.lock php /var/www/opencrm/bin/health_check.php >> /var/www/opencrm/storage/logs/health.log 2>&1
+22 * * * * www-data flock -n /tmp/opencrm-calendar-health.lock php /var/www/opencrm/bin/check_calendar_connections.php >> /var/www/opencrm/storage/logs/calendar-health.log 2>&1
+17 2 * * * www-data flock -n /tmp/opencrm-backup.lock php /var/www/opencrm/bin/backup.php >> /var/www/opencrm/storage/logs/backup.log 2>&1
+45 2 * * * www-data flock -n /tmp/opencrm-backup.lock php /var/www/opencrm/bin/verify_backup.php >> /var/www/opencrm/storage/logs/backup.log 2>&1
