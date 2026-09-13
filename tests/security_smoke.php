@@ -19,6 +19,7 @@ if(!str_contains($schema,'UNIQUE(calendar_id,reserved_start)'))throw new Runtime
 $index=file_get_contents(dirname(__DIR__).'/public/index.php');
 if(!str_contains($index,"if(preg_match('#^/contacts/(\\d+)$#',\$path,\$m)){require_permission('contacts.view');"))throw new RuntimeException('Direct contact route permission guard is absent.');
 if(!str_contains($index,'id="contact-filters"')||!str_contains($index,'Apply filters'))throw new RuntimeException('Server-rendered contact filter panel is absent.');
+if(!str_contains($index,'WHERE LOWER(u.username)=? AND u.active=1')||!str_contains($index,'$loginKey=mb_strtolower($loginName)'))throw new RuntimeException('Case-insensitive login lookup is absent.');
 
 $columns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='bookings'")->fetchAll(PDO::FETCH_COLUMN);
 if(!in_array('reserved_start',$columns,true))throw new RuntimeException('Booking collision migration is absent.');
