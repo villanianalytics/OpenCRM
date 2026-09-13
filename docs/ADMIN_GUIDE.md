@@ -17,6 +17,8 @@ Use Admin settings to set the application name, logo, color scheme, New York or 
 
 Admin → Role permissions provides independent View/use and Create/edit controls for Contacts, Companies, Opportunities, Events, Alerts, Partner Sales, Reports, Lead Magnets, Forms, Promotional Links, Sites, Bookings, Communications, Workflows, Resources, and Quotes/Payments. Edit automatically includes view. Navigation, direct URLs, mutations, dashboard cards, and report datasets enforce the same permissions server-side. Users receive changed role permissions at their next sign-in.
 
+Admin → Microsoft SSO configures Microsoft Entra ID authentication. Existing users may be linked by matching email, or administrators may enable just-in-time creation with a deliberately selected default role. SSO-created accounts never become administrators automatically. Disable JIT when every user must be preapproved, and retain at least one tested local administrator login for recovery.
+
 Reports require both `reports.view` and view permission for the selected source module. Partner Sales view users see their own performance; Partner Sales edit users can review and manage all partners. Record ownership and tag-level restrictions continue to apply after feature permission checks.
 
 ## Configuration catalogs
