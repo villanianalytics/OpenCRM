@@ -43,6 +43,7 @@ if(!in_array('owner_id',$opportunityColumns,true))db()->exec('ALTER TABLE opport
 if(!in_array('active',$opportunityColumns,true))db()->exec('ALTER TABLE opportunities ADD active BOOLEAN NOT NULL DEFAULT TRUE AFTER probability');
 if(!in_array('closed_at',$opportunityColumns,true))db()->exec('ALTER TABLE opportunities ADD closed_at DATETIME NULL AFTER active');db()->exec("UPDATE opportunities SET closed_at=created_at WHERE status IN ('won','lost') AND closed_at IS NULL");
 $userColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='users'")->fetchAll(PDO::FETCH_COLUMN);if(!in_array('display_name',$userColumns,true))db()->exec('ALTER TABLE users ADD display_name VARCHAR(120) NULL AFTER username');db()->exec("UPDATE users SET display_name=username WHERE display_name IS NULL OR display_name=''");
+if(!in_array('entra_object_id',$userColumns,true))db()->exec('ALTER TABLE users ADD entra_object_id VARCHAR(64) NULL UNIQUE AFTER password_hash');
 if(!in_array('partner_sales_access',$userColumns,true))db()->exec('ALTER TABLE users ADD partner_sales_access BOOLEAN NOT NULL DEFAULT FALSE AFTER active');
 $tagColumns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='tags'")->fetchAll(PDO::FETCH_COLUMN);
 if(!in_array('tag_group_id',$tagColumns,true))db()->exec('ALTER TABLE tags ADD tag_group_id BIGINT UNSIGNED NULL AFTER id');

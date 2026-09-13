@@ -32,6 +32,7 @@ Administrators reach settings by selecting their account name and opening the se
 - Mail transport, sending mailboxes, email compliance, operational notifications, and scheduled reports
 - AI provider key and knowledge-base content
 - Google/Microsoft OAuth, Easy!Appointments, Stripe, legal/privacy content, domains, and SEO
+- Microsoft Entra ID single sign-on, including controlled existing-account linking and optional just-in-time provisioning
 
 Sensitive settings are encrypted using `APP_KEY` before database storage. Encryption protects database-only disclosure but does not replace server access control. Application administrators can still replace or use configured integrations.
 
@@ -51,6 +52,12 @@ Create a dedicated API key with the least access and budget appropriate for lead
 - CalDAV should use an app-specific password when the provider supports one.
 - Easy!Appointments remains a separate GPL application connected through its API; follow its licensing and deployment documentation.
 - Calendar connection checks and booking synchronization require cron workers.
+
+## Microsoft Entra ID single sign-on
+
+Create a single-tenant **Web** app registration in Microsoft Entra ID and add the exact redirect URI shown under Admin → Microsoft SSO (normally `https://your-crm.example/auth/microsoft/callback`). Create a client secret, then enter its **value**, the Directory (tenant) ID, and Application (client) ID in OpenCRM. Microsoft documents that production web redirect URIs must use HTTPS and must exactly match the registered URI.
+
+OpenCRM uses authorization-code flow with PKCE, state, and nonce validation. It requests `openid profile email User.Read`; no calendar or mail permissions are required for SSO. By default an active CRM account can be linked when its email matches the signed-in Microsoft account. Optional just-in-time provisioning creates a non-administrator account with the selected default role. Keep JIT disabled if administrators must approve every CRM user. Local password sign-in remains available as a recovery path.
 
 ## Stripe
 
