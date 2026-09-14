@@ -24,6 +24,7 @@ if(!str_contains($index,"require dirname(__DIR__) . '/src/routes_entra_sso.php'"
 if(!str_contains($index,'/assets/mobile-ui.js')||!is_file(dirname(__DIR__).'/public/assets/mobile-ui.js'))throw new RuntimeException('Responsive table and navigation behavior is absent.');
 $sso=file_get_contents(dirname(__DIR__).'/src/routes_entra_sso.php');
 foreach(['code_challenge_method','S256','entra_oauth','hash_equals','graph.microsoft.com/v1.0/me','entra_object_id'] as $needle)if(!str_contains($sso,$needle))throw new RuntimeException('Microsoft SSO security control is absent: '.$needle);
+foreach(["/admin/sso/users","unlink_microsoft_sso","That Entra Object ID is already linked"] as $needle)if(!str_contains($sso,$needle))throw new RuntimeException('Microsoft SSO user-link administration is absent: '.$needle);
 
 $columns=db()->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='bookings'")->fetchAll(PDO::FETCH_COLUMN);
 if(!in_array('reserved_start',$columns,true))throw new RuntimeException('Booking collision migration is absent.');
