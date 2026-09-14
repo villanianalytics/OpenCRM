@@ -19,6 +19,8 @@ Admin → Role permissions provides independent View/use and Create/edit control
 
 Admin → Microsoft SSO configures Microsoft Entra ID authentication. Existing users may be linked by matching email, or administrators may enable just-in-time creation with a deliberately selected default role. SSO-created accounts never become administrators automatically. Disable JIT when every user must be preapproved, and retain at least one tested local administrator login for recovery.
 
+Use Admin → Microsoft SSO → Manage user links to pre-link an existing CRM account. Copy the user's immutable **Object ID** from Microsoft Entra ID and paste it beside the corresponding CRM user. Do not use the tenant ID or application/client ID. Saving a blank value removes the link; duplicate Object IDs are rejected.
+
 Reports require both `reports.view` and view permission for the selected source module. Partner Sales view users see their own performance; Partner Sales edit users can review and manage all partners. Record ownership and tag-level restrictions continue to apply after feature permission checks.
 
 ## Configuration catalogs
